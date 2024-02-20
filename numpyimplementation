@@ -1,0 +1,38 @@
+import numpy as np
+
+def calculate_g0_numpy(G, n1, n2, n3):
+    weights = [np.ones(n1) / n1, np.ones(n2) / n2, np.ones(n3) / n3]
+    return np.tensordot(G, weights, axes=([0, 1, 2], [0, 1, 2]))
+
+def calculate_gi_numpy(G, g0, n1, n2, n3):
+    weights1 = [np.ones(n2) / n2, np.ones(n3) / n3]
+    weights2 = [np.ones(n1) / n1, np.ones(n3) / n3]
+    weights3 = [np.ones(n1) / n1, np.ones(n2) / n2]
+
+    g1 = np.tensordot(G, weights1, axes=([1, 2], [0, 1])) - g0 / n1
+    g2 = np.tensordot(G, weights2, axes=([0, 2], [0, 1])) - g0 / n2
+    g3 = np.tensordot(G, weights3, axes=([0, 1], [0, 1])) - g0 / n3
+
+    return g1, g2, g3
+
+# Example usage with sample data
+n1, n2, n3 = 10, 10, 10
+G = np.random.rand(n1, n2, n3)
+g0_numpy = calculate_g0_numpy(G, n1, n2, n3)
+g1_numpy, g2_numpy, g3_numpy = calculate_gi_numpy(G, g0_numpy, n1, n2, n3)
+
+def calculate_gij_numpy(G, g0, g1, g2, g3, n1, n2, n3):
+    # Calculate g(12), g(13), and g(23)
+    weight3 = np.ones(n3) / n3
+    g12 = np.tensordot(G, weight3, axes=([2], [0])) - np.outer(g1, np.ones(n2)) - np.outer(np.ones(n1), g2) + g0
+
+    weight2 = np.ones(n2) / n2
+    g13 = np.tensordot(G, weight2, axes=([1], [0])) - np.outer(g1, np.ones(n3)) - np.outer(np.ones(n1), g3) + g0
+
+    weight1 = np.ones(n1) / n1
+    g23 = np.tensordot(G, weight1, axes=([0], [0])) - np.outer(g2, np.ones(n3)) - np.outer(np.ones(n2), g3) + g0
+
+    return g12, g13, g23
+
+# Calculate two-way components
+g12_numpy, g13_numpy, g23_numpy = calculate_gij_numpy(G, g0_numpy, g1_numpy, g2_numpy, g3_numpy, n1, n2, n3)
