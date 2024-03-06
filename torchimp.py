@@ -1,30 +1,52 @@
 import torch
+from itertools import combinations
 
-def calculate_g0_torch(G, n1, n2, n3):
-    s1 = torch.ones(n1, 1,dtype=torch.float64)
-    s2 = torch.ones(n2, 1,dtype=torch.float64)
-    s3 = torch.ones(n3, 1,dtype=torch.float64)
-    w1,w2,w3 = 1/n1, 1/n2, 1/n3
-    g0=torch.tensordot(torch.tensordot(torch.tensordot(G, s1, dims=([0], [0])), 
-                                s2, dims=([0], [0])),s3,dims=([0], [0])) * w1 * w2*w3    
-    return g0
+class NDEMPRCalculator:
+    def __init__(self, G):
+        self.G = G
+        self.dimensions = G.shape
+        self.support_vectors = self.calculate_support_vectors()
+        self.weights = [1/dim for dim in self.dimensions]  # Calculate weights
 
-def calculate_gi_torch(G, g0, n1, n2, n3):
-    s1 = torch.ones(n1, 1,dtype=torch.float64)
-    s2 = torch.ones(n2, 1,dtype=torch.float64)
-    s3 = torch.ones(n3, 1,dtype=torch.float64)
-    w1,w2,w3 = 1/n1, 1/n2, 1/n3
-    g1=(torch.tensordot(torch.tensordot(G, s2, dims=([1], [0])), s3, dims=([1], [0])) * w2 * w3).reshape(n1,1)-(g0[0][0][0]*s1)
-    g2=(torch.tensordot(torch.tensordot(G, s1, dims=([0], [0])), s3, dims=([1], [0])) * w1 * w3).reshape(n2,1)-(g0[0][0][0]*s2)
-    g3=(torch.tensordot(torch.tensordot(G, s1, dims=([0], [0])), s2, dims=([0], [0])) * w1 * w2).reshape(n3,1)-(g0[0][0][0]*s3)
-    return g1,g2,g3
+    def calculate_support_vectors(self):
+        support_vectors = []
+        for dim_size in self.dimensions:
+            s = torch.ones(dim_size,dtype=torch.float64)
+            l2_norm = torch.norm(s, p=2)
+            modified_s = (s * (dim_size ** 0.5)) / l2_norm
+            support_vectors.append(modified_s.view(-1, 1))
+        return support_vectors
 
-def calculate_gij_torch(G, g0, g1, g2, g3, n1, n2, n3):
-    s1 = torch.ones(n1, 1,dtype=torch.float64)
-    s2 = torch.ones(n2, 1,dtype=torch.float64)
-    s3 = torch.ones(n3, 1,dtype=torch.float64)
-    w1,w2,w3 = 1/n1, 1/n2, 1/n3
-    g12=(torch.tensordot(G_torch, s3, dims=([2], [0]))* w3).reshape(n1,n2)-(g0[0][0][0]*s1*s2.T)-(g1*s2.T)-(s1*g2.T)
-    g13=(torch.tensordot(G_torch, s2, dims=([1], [0]))* w2).reshape(n1,n3)-(g0[0][0][0]*s1*s3.T)-(g1*s3.T)-(s1*g3.T)
-    g23=(torch.tensordot(G_torch, s1, dims=([0], [0]))* w1).reshape(n2,n3)-(g0[0][0][0]*s2*s3.T)-(g2*s3.T)-(s2*g3.T)
-    return g12,g13,g23
+    def calculate_g0(self):
+        g0 = self.G
+        for i, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
+            g0 = torch.tensordot(g0, s, dims=([0], [0])) * w
+        return g0.item()
+
+    def calculate_gi(self):
+        gi_components = []
+        g0 = self.calculate_g0() # Assuming g0 reduces to a scalar
+
+        for i in range(len(self.dimensions)):
+            ind=0
+            temp_G = self.G.clone()
+            for j, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
+                if j != i:
+                    # Integrate over dimensions except the current one, adjusted by corresponding weight
+                    temp_G = torch.tensordot(temp_G, s, dims=([ind], [0])) * w
+                    print(temp_G.shape)
+                else:
+                    ind+=1
+
+            # Normalize the gi component
+            gi = temp_G.view(-1,1) - g0 * self.support_vectors[i]
+            gi_components.append(gi.view(-1, 1))
+
+        return gi_components
+
+# Example usage
+G = torch.rand(3, 4, 5)  # Example N-dimensional tensor
+#G = tensor_reshaped
+empr_calculator = NDEMPRCalculator(G)
+g0 = empr_calculator.calculate_g0()
+gi = empr_calculator.calculate_gi()
