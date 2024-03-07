@@ -45,7 +45,7 @@ class NDEMPRCalculator:
         return gi_components
 
 # Example usage
-G = torch.rand(3, 4, 5)  # Example N-dimensional tensor
+G = torch.rand(3, 4, 5,6,7 ,dtype=torch.float64)  # For double precision float
 #G = tensor_reshaped
 empr_calculator = NDEMPRCalculator(G)
 g0 = empr_calculator.calculate_g0()
