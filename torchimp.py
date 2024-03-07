@@ -3,24 +3,53 @@ import numpy as np
 from itertools import combinations
 
 class NDEMPRCalculator:
-    def __init__(self, G):
+
+    def __init__(self, G, supports = 'das'):
+
         self.G = G.double()
         self.dimensions = G.shape
-        self.support_vectors = self.calculate_support_vectors()
+        self.support_vectors = self.initialize_support_vectors(supports)
         self.weights = [1/dim for dim in self.dimensions]  # Calculate weights
         self.g0 = self.calculate_g0()
         self.g_components = {}
 
-    def calculate_support_vectors(self):
+    def initialize_support_vectors(self, supports):
+
         support_vectors = []
-        for dim_size in self.dimensions:
-            s = torch.ones(dim_size,dtype=torch.float64)
-            l2_norm = torch.norm(s, p=2)
-            modified_s = (s * (dim_size ** 0.5)) / l2_norm
-            support_vectors.append(modified_s.view(-1, 1))
+
+        if supports == 'das':
+
+            for i in range(len(self.dimensions)):
+                temp = self.G
+                ind = 0
+                for j in range(len(self.dimensions)):
+                    if j != i:
+                        temp = torch.mean(temp, ind)
+                    else:
+                        ind += 1
+                temp = torch.unsqueeze(temp, -1)
+                support_vectors.append(temp)                
+
+        elif supports == 'ones':
+            
+            for dim_size in self.dimensions:
+                s = torch.ones(dim_size, 1, dtype=torch.float64)
+                l2_norm = torch.norm(s, p=2)
+                modified_s = (s * (dim_size ** 0.5)) / l2_norm
+                support_vectors.append(modified_s)
+
+        elif supports == 'admm':
+            # hehe maybe in the future?
+            pass
+
+        elif supports == 'file':
+            # for futureproofing?
+            pass
+
         return support_vectors
 
     def calculate_g0(self):
+
         g0 = self.G
         for i, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
             g0 = torch.tensordot(g0, s, dims=([0], [0])) * w
@@ -98,7 +127,7 @@ class NDEMPRCalculator:
 # Example usage
 G = torch.rand(3, 4, 5, 6, 7)
 
-empr_calculator = NDEMPRCalculator(G)
+empr_calculator = NDEMPRCalculator(G, supports = 'das')
 empr_calculator.calculate_empr_component([0])
 empr_calculator.calculate_empr_component([1])
 empr_calculator.calculate_empr_component([4])
