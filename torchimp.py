@@ -5,6 +5,11 @@ from itertools import combinations
 class NDEMPRCalculator:
 
     def __init__(self, G, supports = 'das'):
+        
+        if torch.cuda.is_available():
+            G = G.to('cuda')
+        else:
+            print('Defaulted to CPU')
 
         self.G = G.double()
         self.dimensions = G.shape
