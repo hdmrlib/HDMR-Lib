@@ -9,9 +9,10 @@ class NDEMPRCalculator:
         self.G = G.double()
         self.dimensions = G.shape
         self.support_vectors = self.initialize_support_vectors(supports)
-        self.weights = [1/dim for dim in self.dimensions]  # Calculate weights
+        self.weights = [1/dim for dim in self.dimensions]  # Calculate EMPR weights
         self.g0 = self.calculate_g0()
         self.g_components = {}
+        self.calculate_empr_component(np.arange(len(self.dimensions)))
 
     def initialize_support_vectors(self, supports):
 
@@ -54,27 +55,6 @@ class NDEMPRCalculator:
         for i, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
             g0 = torch.tensordot(g0, s, dims=([0], [0])) * w
         return g0.item()
-
-    def calculate_gi(self): # Deprecated 
-
-        gi_components = []
-
-        for i in range(len(self.dimensions)):
-            ind=0
-            temp_G = self.G.clone()
-            for j, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
-                if j != i:
-                    # Integrate over dimensions except the current one, adjusted by corresponding weight
-                    temp_G = torch.tensordot(temp_G, s, dims=([ind], [0])) * w
-                    print(temp_G.shape)
-                else:
-                    ind+=1
-
-            # Normalize the gi component
-            gi = temp_G.view(-1,1) - self.g0 * self.support_vectors[i]
-            gi_components.append(gi.view(-1, 1))
-
-        return gi_components
     
     def calculate_empr_component(self, involved_dims):
 
@@ -87,8 +67,27 @@ class NDEMPRCalculator:
 
         def convert_g_to_string(dims):
             return 'g_' + ''.join(map(str, list(map(lambda x:x+1, dims))))
+        
+        def check_required_components(dims):
+
+            # Check if all required g_components are calculated
+            for i in range(1, len(dims)):
+                for g_combination in combinations(dims, i):
+
+                    component_name = convert_g_to_string(g_combination)
+                    if component_name not in self.g_components.keys():
+
+                        #print("\033[33mWarning,", component_name, "not found in previously calculated components...\033[0m")
+                        #print("Adding", component_name, "to the queue")
+
+                        self.calculate_empr_component(g_combination)
+
+                    
     
-        #INITIALIZATIONS
+        # CHECKING REQUIREMENTS
+        check_required_components(involved_dims)
+
+        # INITIALIZATIONS
         G_component = self.G
         involved_dims = sorted(involved_dims)
 
@@ -125,16 +124,9 @@ class NDEMPRCalculator:
         self.g_components[convert_g_to_string(involved_dims)] = G_component
 
 # Example usage
-G = torch.rand(3, 4, 5, 6, 7)
+G = torch.rand(3, 4, 5)
 
 empr_calculator = NDEMPRCalculator(G, supports = 'das')
-empr_calculator.calculate_empr_component([0])
-empr_calculator.calculate_empr_component([1])
-empr_calculator.calculate_empr_component([4])
-empr_calculator.calculate_empr_component([0,1])
-empr_calculator.calculate_empr_component([0,4])
-empr_calculator.calculate_empr_component([1,4])
-empr_calculator.calculate_empr_component([0,1,4])
 
 for key in empr_calculator.g_components.keys():
-    print(key, " - ", empr_calculator.g_components[key])
+    print(key, " - shape :", empr_calculator.g_components[key].shape, "\n\t", empr_calculator.g_components[key])
