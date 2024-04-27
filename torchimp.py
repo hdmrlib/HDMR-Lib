@@ -136,4 +136,5 @@ empr_calculator.calculate_empr_component([0,4])
 empr_calculator.calculate_empr_component([1,4])
 empr_calculator.calculate_empr_component([0,1,4])
 
-print(empr_calculator.g_components)
+for key in empr_calculator.g_components.keys():
+    print(key, " - ", empr_calculator.g_components[key])
