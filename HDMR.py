@@ -1,10 +1,14 @@
+
+## EXPLAINABILITY - ORDER
+## ONES
+
 import torch
 import numpy as np
 from itertools import combinations
 
-class NDEMPRCalculator:
+class NDHDMRCalculator:
 
-    def __init__(self, G, supports = 'das'):
+    def __init__(self, G, weight = "avg", supports = 'ones'):
         
         if torch.cuda.is_available():
             G = G.to('cuda')
@@ -14,16 +18,34 @@ class NDEMPRCalculator:
         self.G = G.double()
         self.dimensions = G.shape
         self.support_vectors = self.initialize_support_vectors(supports)
-        self.weights = [1/dim for dim in self.dimensions]  # Calculate EMPR weights
+        self.weights = self.initialize_weights(weight)
         self.g0 = self.calculate_g0()
         self.g_components = {}
-        self.calculate_empr_component(np.arange(len(self.dimensions)))
+        self.calculate_hdmr_component(np.arange(len(self.dimensions)))
+
+    def initialize_weights(self, weight):
+
+        weights = []
+
+        if weight == 'avg':
+
+            for dim_size in self.dimensions:
+                w = torch.ones(dim_size, 1, dtype=torch.float64)
+                l2_norm = torch.norm(w, p=2)
+                modified_w = (w * (dim_size ** 0.5)) / l2_norm
+                weights.append(modified_w / dim_size)
+
+        elif weight == 'file':
+            # for futureproofing?
+            pass
+
+        return weights
 
     def initialize_support_vectors(self, supports):
 
         support_vectors = []
 
-        if supports == 'das':
+        if supports == 'das': # Directionally Averaged Supports
 
             for i in range(len(self.dimensions)):
                 temp = self.G
@@ -58,10 +80,10 @@ class NDEMPRCalculator:
 
         g0 = self.G
         for i, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
-            g0 = torch.tensordot(g0, s, dims=([0], [0])) * w
+            g0 = torch.tensordot(g0, s * w, dims=([0], [0]))
         return g0.item()
     
-    def calculate_empr_component(self, involved_dims):
+    def calculate_hdmr_component(self, involved_dims):
 
         # Calculation Parts:
         #
@@ -85,7 +107,7 @@ class NDEMPRCalculator:
                         #print("\033[33mWarning,", component_name, "not found in previously calculated components...\033[0m")
                         #print("Adding", component_name, "to the queue")
 
-                        self.calculate_empr_component(g_combination)
+                        self.calculate_hdmr_component(g_combination)
 
                     
     
@@ -100,15 +122,15 @@ class NDEMPRCalculator:
         ind=0
         for j, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
             if j not in involved_dims:
-                G_component = torch.tensordot(G_component, s, dims=([ind], [0])) * w
+                G_component = torch.tensordot(G_component, s * w, dims=([ind], [0]))
             else:
                 ind+=1
 
         # SECOND PART
-        subtracted = torch.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
+        subtracted = torch.squeeze((self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]]) * self.g0)
         for i in range(1, len(involved_dims)):
             subtracted = torch.einsum('...i, jk->...ij', subtracted, 
-                                                         self.support_vectors[involved_dims[i]])
+                                                         (self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]]))
         # THIRD PART
         if len(involved_dims) > 1:
             for i in range(1, len(involved_dims)):
@@ -118,7 +140,7 @@ class NDEMPRCalculator:
 
                         for k in range(len(s)):
                             term = torch.einsum('...i, jk->...ij', term, 
-                                                                   self.support_vectors[s[k]])
+                                                                   (self.support_vectors[s[k]] * self.weights[s[k]]))
                             
                         subtracted += torch.permute(term, np.argsort(list(g_combination) + s).tolist())
 
@@ -129,9 +151,10 @@ class NDEMPRCalculator:
         self.g_components[convert_g_to_string(involved_dims)] = G_component
 
 # Example usage
+torch.manual_seed(0)
 G = torch.rand(3, 4, 5)
 
-empr_calculator = NDEMPRCalculator(G, supports = 'das')
+empr_calculator = NDHDMRCalculator(G, weight = "avg", supports = 'ones')
 
 for key in empr_calculator.g_components.keys():
     print(key, " - shape :", empr_calculator.g_components[key].shape, "\n\t", empr_calculator.g_components[key])
