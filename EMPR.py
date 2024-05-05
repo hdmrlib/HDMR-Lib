@@ -65,6 +65,23 @@ class NDEMPRCalculator:
             g0 = torch.tensordot(g0, s, dims=([0], [0])) * w
         return g0.item()
     
+    def convert_g_to_string(self, dims):
+        return 'g_' + ''.join(map(str, list(map(lambda x:x+1, dims))))
+    
+    def check_required_components(self, dims):
+
+        # Check if all required g_components are calculated
+        for i in range(1, len(dims)):
+            for g_combination in combinations(dims, i):
+
+                component_name = self.convert_g_to_string(g_combination)
+                if component_name not in self.g_components.keys():
+
+                    #print("\033[33mWarning,", component_name, "not found in previously calculated components...\033[0m")
+                    #print("Adding", component_name, "to the queue")
+
+                    self.calculate_empr_component(g_combination)
+
     def calculate_empr_component(self, involved_dims):
 
         # Calculation Parts:
@@ -73,28 +90,9 @@ class NDEMPRCalculator:
         #          - g_0 s_1...s_n                                [SECOND PART]
         #          - g_1s_2...s_n - ... - s_1...s_(n-1)g_n - ...  [THIRD PART]
         #    
-
-        def convert_g_to_string(dims):
-            return 'g_' + ''.join(map(str, list(map(lambda x:x+1, dims))))
-        
-        def check_required_components(dims):
-
-            # Check if all required g_components are calculated
-            for i in range(1, len(dims)):
-                for g_combination in combinations(dims, i):
-
-                    component_name = convert_g_to_string(g_combination)
-                    if component_name not in self.g_components.keys():
-
-                        #print("\033[33mWarning,", component_name, "not found in previously calculated components...\033[0m")
-                        #print("Adding", component_name, "to the queue")
-
-                        self.calculate_empr_component(g_combination)
-
-                    
     
         # CHECKING REQUIREMENTS
-        check_required_components(involved_dims)
+        self.check_required_components(involved_dims)
 
         # INITIALIZATIONS
         G_component = self.G
@@ -118,7 +116,7 @@ class NDEMPRCalculator:
             for i in range(1, len(involved_dims)):
                     for g_combination in combinations(involved_dims, i):
                         s = [x for x in involved_dims if x not in g_combination]
-                        term = torch.squeeze(self.g_components[convert_g_to_string(g_combination)])
+                        term = torch.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
 
                         for k in range(len(s)):
                             term = torch.einsum('...i, jk->...ij', term, 
@@ -130,7 +128,39 @@ class NDEMPRCalculator:
         subtracted = torch.squeeze(subtracted)
         G_component -= subtracted
 
-        self.g_components[convert_g_to_string(involved_dims)] = G_component
+        self.g_components[self.convert_g_to_string(involved_dims)] = G_component
+
+    def calculate_approximation(self, order):
+
+        # Calculation Parts:
+        #
+        #        = g_0 s_1...s_n +                                [FIRST PART]
+        #          + g_1s_2...s_n + ... + s_1...s_(n-1)g_n +      [SECOND PART]
+        #          + ... +
+        #          + g_1...(n-1)s_n + ... + s_1g_2...n            [N'TH PART]
+        #
+
+        involved_dims = np.arange(len(self.dimensions))
+
+        # FIRST PART
+        overall_sum = torch.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
+        for i in range(1, len(involved_dims)):
+            overall_sum = torch.einsum('...i, jk->...ij', overall_sum, 
+                                                          self.support_vectors[involved_dims[i]])
+            
+        # SECOND-N'TH PART
+        for i in range(1, order+1):
+            for g_combination in combinations(involved_dims, i):
+                s = [x for x in involved_dims if x not in g_combination]
+                term = torch.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
+
+                for k in range(len(s)):
+                    term = torch.einsum('...i, jk->...ij', term, 
+                                                           self.support_vectors[s[k]])
+                    
+                overall_sum += torch.permute(term, np.argsort(list(g_combination) + s).tolist())
+
+        return torch.squeeze(overall_sum)
 
 # Example usage
 torch.manual_seed(0)
@@ -138,5 +168,12 @@ G = torch.rand(3, 4, 5)
 
 empr_calculator = NDEMPRCalculator(G, supports = 'das')
 
+'''
 for key in empr_calculator.g_components.keys():
     print(key, " - shape :", empr_calculator.g_components[key].shape, "\n\t", empr_calculator.g_components[key])
+'''
+
+print("Original:")
+print(G)
+print("Approx:")
+print(empr_calculator.calculate_approximation(order=3))
