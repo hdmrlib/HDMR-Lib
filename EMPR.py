@@ -52,7 +52,7 @@ class NDEMPRCalculator:
             # hehe maybe in the future?
             pass
 
-        elif supports == 'file':
+        elif supports == 'custom':
             # for futureproofing?
             pass
 

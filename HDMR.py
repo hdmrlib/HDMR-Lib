@@ -1,6 +1,8 @@
 
-## EXPLAINABILITY - ORDER
+## ORDER
 ## ONES
+## MSE
+## Sensitivity analysis
 
 import torch
 import numpy as np
@@ -35,8 +37,12 @@ class NDHDMRCalculator:
                 modified_w = (w * (dim_size ** 0.5)) / l2_norm
                 weights.append(modified_w / dim_size)
 
-        elif weight == 'file':
+        elif weight == 'custom':
             # for futureproofing?
+            pass
+        elif weight == 'gaussian':
+            pass
+        elif weight == 'chebyshev':
             pass
 
         return weights
@@ -70,7 +76,7 @@ class NDHDMRCalculator:
             # hehe maybe in the future?
             pass
 
-        elif supports == 'file':
+        elif supports == 'custom':
             # for futureproofing?
             pass
 
@@ -192,4 +198,4 @@ for key in hdmr_calculator.g_components.keys():
 print("Original:")
 print(G)
 print("Approx:")
-print(hdmr_calculator.calculate_approximation(order=3))
+print(hdmr_calculator.calculate_approximation(order=2))
