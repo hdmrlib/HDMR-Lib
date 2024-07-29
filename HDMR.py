@@ -10,7 +10,7 @@ from itertools import combinations
 
 class NDHDMRCalculator:
 
-    def __init__(self, G, weight = "avg", supports = 'ones'):
+    def __init__(self, G, weight = "avg", custom_weights = None, supports = 'ones', custom_supports = None):
         
         if torch.cuda.is_available():
             G = G.to('cuda')
@@ -19,7 +19,9 @@ class NDHDMRCalculator:
 
         self.G = G.double()
         self.dimensions = G.shape
+        self.custom_supports = custom_supports
         self.support_vectors = self.initialize_support_vectors(supports)
+        self.custom_weights = custom_weights
         self.weights = self.initialize_weights(weight)
         self.g0 = self.calculate_g0()
         self.g_components = {}
@@ -29,7 +31,7 @@ class NDHDMRCalculator:
 
         weights = []
 
-        if weight == 'avg':
+        if weight == 'average':
 
             for dim_size in self.dimensions:
                 w = torch.ones(dim_size, 1, dtype=torch.float64)
@@ -38,12 +40,35 @@ class NDHDMRCalculator:
                 weights.append(modified_w / dim_size)
 
         elif weight == 'custom':
-            # for futureproofing?
-            pass
+
+            if self.custom_weights is None:
+                raise ValueError("Custom weights must be provided for 'custom' weight type.")
+            
+            if len(self.custom_weights) != len(self.dimensions):
+                raise ValueError("The number of custom weights must match the number of dimensions.")
+            
+            for w in self.custom_weights:
+                if not torch.is_tensor(w):
+                    w = torch.tensor(w, dtype=torch.float64)
+                weights.append(w)
+
         elif weight == 'gaussian':
-            pass
+
+            for dim_size in self.dimensions:
+                w = torch.randn(dim_size, 1, dtype=torch.float64)
+                l2_norm = torch.norm(w, p=2)
+                modified_w = (w * (dim_size ** 0.5)) / l2_norm
+                weights.append(modified_w / dim_size)
+
         elif weight == 'chebyshev':
-            pass
+
+            for dim_size in self.dimensions:
+                k = torch.arange(1, dim_size + 1, dtype=torch.float64)
+                w = torch.cos((2 * k - 1) * np.pi / (2 * dim_size))
+                w = w.view(dim_size, 1)
+                l2_norm = torch.norm(w, p=2)
+                modified_w = (w * (dim_size ** 0.5)) / l2_norm
+                weights.append(modified_w / dim_size)
 
         return weights
 
@@ -72,13 +97,18 @@ class NDHDMRCalculator:
                 modified_s = (s * (dim_size ** 0.5)) / l2_norm
                 support_vectors.append(modified_s)
 
-        elif supports == 'admm':
-            # hehe maybe in the future?
-            pass
-
         elif supports == 'custom':
-            # for futureproofing?
-            pass
+
+            if self.custom_supports is None:
+                raise ValueError("Custom supports must be provided for 'custom' support type.")
+            
+            if len(self.custom_supports) != len(self.dimensions):
+                raise ValueError("The number of custom supports must match the number of dimensions.")
+            
+            for w in self.custom_supports:
+                if not torch.is_tensor(w):
+                    s = torch.tensor(s, dtype=torch.float64)
+                support_vectors.append(s)
 
         return support_vectors
 
@@ -190,7 +220,13 @@ class NDHDMRCalculator:
 torch.manual_seed(0)
 G = torch.rand(3, 4, 5)
 
-hdmr_calculator = NDHDMRCalculator(G, weight = "avg", supports = 'ones')
+hdmr_calculator = NDHDMRCalculator(G, weight = "average", supports = 'ones')
+#hdmr_calculator = NDHDMRCalculator(G, weight = "gaussian", supports = 'ones')
+#hdmr_calculator = NDHDMRCalculator(G, weight = "chebyshev", supports = 'ones')
+
+# ADD CUSTOM COMPONENTS []
+#hdmr_calculator = NDHDMRCalculator(G, weight = "custom", custom_weights = [], supports = 'ones')
+#hdmr_calculator = NDHDMRCalculator(G, weight = "average", supports = 'custom', custom_supports = None)
 
 for key in hdmr_calculator.g_components.keys():
     print(key, " - shape :", hdmr_calculator.g_components[key].shape, "\n\t", hdmr_calculator.g_components[key])

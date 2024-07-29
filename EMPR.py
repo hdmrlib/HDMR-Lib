@@ -8,7 +8,7 @@ from itertools import combinations
 
 class NDEMPRCalculator:
 
-    def __init__(self, G, supports = 'das'):
+    def __init__(self, G, supports = 'das', custom_supports = None):
         
         if torch.cuda.is_available():
             G = G.to('cuda')
@@ -17,6 +17,7 @@ class NDEMPRCalculator:
 
         self.G = G.double()
         self.dimensions = G.shape
+        self.custom_supports = custom_supports
         self.support_vectors = self.initialize_support_vectors(supports)
         self.weights = [1/dim for dim in self.dimensions]  # Calculate EMPR weights
         self.g0 = self.calculate_g0()
@@ -48,13 +49,18 @@ class NDEMPRCalculator:
                 modified_s = (s * (dim_size ** 0.5)) / l2_norm
                 support_vectors.append(modified_s)
 
-        elif supports == 'admm':
-            # hehe maybe in the future?
-            pass
-
         elif supports == 'custom':
-            # for futureproofing?
-            pass
+
+            if self.custom_supports is None:
+                raise ValueError("Custom supports must be provided for 'custom' support type.")
+            
+            if len(self.custom_supports) != len(self.dimensions):
+                raise ValueError("The number of custom supports must match the number of dimensions.")
+            
+            for w in self.custom_supports:
+                if not torch.is_tensor(w):
+                    s = torch.tensor(s, dtype=torch.float64)
+                support_vectors.append(s)
 
         return support_vectors
 
@@ -167,6 +173,9 @@ torch.manual_seed(0)
 G = torch.rand(3, 4, 5)
 
 empr_calculator = NDEMPRCalculator(G, supports = 'das')
+
+# ADD CUSTOM COMPONENTS []
+#empr_calculator = NDEMPRCalculator(G, supports = 'custom', custom_supports = None)
 
 '''
 for key in empr_calculator.g_components.keys():
