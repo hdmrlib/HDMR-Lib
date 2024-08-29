@@ -120,7 +120,7 @@ class NDHDMRCalculator:
         return g0.item()
     
     def convert_g_to_string(self, dims):
-        return 'g_' + ''.join(map(str, list(map(lambda x:x+1, dims))))
+        return 'g_' + ','.join(map(str, list(map(lambda x:x+1, dims))))
 
     def check_required_components(self, dims):
 
