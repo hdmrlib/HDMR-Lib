@@ -1,164 +1,157 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <string.h>
 
+// TensorND yapısı, n boyutlu tensorleri temsil eder
 typedef struct {
     double *data;
-    int dim1, dim2, dim3;
-} Tensor3D;
-
-typedef struct {
-    Tensor3D *G;
-    Tensor3D **support_vectors;
-    double g0;
-    Tensor3D **g_components;
-    int *dimensions;
+    int *dims;
     int num_dims;
-} NDEMPRCalculator;
+} TensorND;
 
-// Tensor oluşturma
-Tensor3D* create_tensor3d(int dim1, int dim2, int dim3) {
-    Tensor3D* tensor = (Tensor3D*)malloc(sizeof(Tensor3D));
-    tensor->dim1 = dim1;
-    tensor->dim2 = dim2;
-    tensor->dim3 = dim3;
-    tensor->data = (double*)malloc(dim1 * dim2 * dim3 * sizeof(double));
+// TensorND oluşturma
+TensorND* create_tensor(int num_dims, int *dims) {
+    TensorND *tensor = (TensorND*)malloc(sizeof(TensorND));
+    tensor->num_dims = num_dims;
+    tensor->dims = (int*)malloc(num_dims * sizeof(int));
+
+    int total_size = 1;
+    for (int i = 0; i < num_dims; i++) {
+        tensor->dims[i] = dims[i];
+        total_size *= dims[i];
+    }
+    tensor->data = (double*)malloc(total_size * sizeof(double));
     return tensor;
 }
 
-// Tensor serbest bırakma
-void free_tensor3d(Tensor3D* tensor) {
+// TensorND belleği serbest bırakma
+void free_tensor(TensorND *tensor) {
     free(tensor->data);
+    free(tensor->dims);
     free(tensor);
 }
 
-// Tensor verilerini rastgele doldurma
-void fill_tensor3d_random(Tensor3D* tensor) {
-    for (int i = 0; i < tensor->dim1 * tensor->dim2 * tensor->dim3; i++) {
-        tensor->data[i] = (double)rand() / RAND_MAX;
+// TensorND değerini alma
+double get_tensor_value(TensorND *tensor, int *indices) {
+    int index = 0;
+    int stride = 1;
+    for (int i = tensor->num_dims - 1; i >= 0; i--) {
+        index += indices[i] * stride;
+        stride *= tensor->dims[i];
     }
+    return tensor->data[index];
 }
 
-// Tensor yazdırma
-void print_tensor3d(Tensor3D* tensor) {
-    for (int i = 0; i < tensor->dim1; i++) {
-        for (int j = 0; j < tensor->dim2; j++) {
-            for (int k = 0; k < tensor->dim3; k++) {
-                printf("%f ", tensor->data[i * tensor->dim2 * tensor->dim3 + j * tensor->dim3 + k]);
+// TensorND değerini ayarlama
+void set_tensor_value(TensorND *tensor, int *indices, double value) {
+    int index = 0;
+    int stride = 1;
+    for (int i = tensor->num_dims - 1; i >= 0; i--) {
+        index += indices[i] * stride;
+        stride *= tensor->dims[i];
+    }
+    tensor->data[index] = value;
+}
+
+// TensorND üzerinde eksene göre tensor dot işlemi
+TensorND* tensor_dot(TensorND *A, TensorND *B, int axis) {
+    TensorND *result = create_tensor(A->num_dims, A->dims);
+
+    int *indices = (int*)calloc(A->num_dims, sizeof(int));
+    int total_elements = 1;
+    for (int i = 0; i < A->num_dims; i++) {
+        total_elements *= A->dims[i];
+    }
+
+    for (int n = 0; n < total_elements; n++) {
+        int temp_n = n;
+        for (int i = A->num_dims - 1; i >= 0; i--) {
+            indices[i] = temp_n % A->dims[i];
+            temp_n /= A->dims[i];
+        }
+
+        double sum = get_tensor_value(A, indices) + get_tensor_value(B, indices);
+        set_tensor_value(result, indices, sum);
+    }
+
+    free(indices);
+    return result;
+}
+
+// g0 hesaplama fonksiyonu
+double calculate_g0(TensorND *G, TensorND **support_vectors, double *weights, int dimensions) {
+    TensorND *g0 = G;
+    for (int i = 0; i < dimensions; i++) {
+        TensorND *temp = tensor_dot(g0, support_vectors[i], 0);
+        free_tensor(g0);
+        g0 = temp;
+    }
+    double result = get_tensor_value(g0, (int[]){0});
+    free_tensor(g0);
+    return result;
+}
+
+// Yaklaşım hesaplama fonksiyonu
+TensorND* calculate_approximation(TensorND *G, TensorND **support_vectors, double *weights, int dimensions, int order) {
+    TensorND *overall_sum = tensor_dot(G, support_vectors[0], 0);
+    
+    for (int i = 1; i < order; i++) {
+        for (int j = 0; j < dimensions; j++) {
+            TensorND *temp = tensor_dot(overall_sum, support_vectors[j], 0);
+            free_tensor(overall_sum);
+            overall_sum = temp;
+        }
+    }
+
+    return overall_sum;
+}
+
+int main() {
+    int dims[] = {3, 4, 5};
+    int num_dims = sizeof(dims) / sizeof(dims[0]);
+
+    TensorND *G = create_tensor(num_dims, dims);
+
+    // Örnek tensor verileri
+    for (int i = 0; i < dims[0]; i++) {
+        for (int j = 0; j < dims[1]; j++) {
+            for (int k = 0; k < dims[2]; k++) {
+                int indices[] = {i, j, k};
+                set_tensor_value(G, indices, rand() / (double)RAND_MAX);
+            }
+        }
+    }
+
+    TensorND *support_vectors[3];
+    for (int i = 0; i < 3; i++) {
+        support_vectors[i] = create_tensor(num_dims, dims);
+        // Destek vektörlerini doldur
+    }
+
+    double weights[3] = {1.0 / dims[0], 1.0 / dims[1], 1.0 / dims[2]};
+
+    double g0 = calculate_g0(G, support_vectors, weights, num_dims);
+    printf("g0: %f\n", g0);
+
+    TensorND *approximation = calculate_approximation(G, support_vectors, weights, num_dims, 3);
+
+    printf("Approximation Tensor:\n");
+    for (int i = 0; i < dims[0]; i++) {
+        for (int j = 0; j < dims[1]; j++) {
+            for (int k = 0; k < dims[2]; k++) {
+                int indices[] = {i, j, k};
+                printf("%f ", get_tensor_value(approximation, indices));
             }
             printf("\n");
         }
         printf("\n");
     }
-}
 
-// Tensor çarpımı (sadeleştirilmiş)
-void tensor_multiply(Tensor3D* result, Tensor3D* A, Tensor3D* B) {
-    for (int i = 0; i < A->dim1; i++) {
-        for (int j = 0; j < A->dim2; j++) {
-            for (int k = 0; k < A->dim3; k++) {
-                result->data[i * result->dim2 * result->dim3 + j * result->dim3 + k] =
-                    A->data[i * A->dim2 * A->dim3 + j * A->dim3 + k] *
-                    B->data[i * B->dim2 * B->dim3 + j * B->dim3 + k];
-            }
-        }
+    free_tensor(G);
+    for (int i = 0; i < 3; i++) {
+        free_tensor(support_vectors[i]);
     }
-}
-
-// EMPR hesaplama sınıfı başlatma
-NDEMPRCalculator* init_calculator(Tensor3D* G) {
-    NDEMPRCalculator* calc = (NDEMPRCalculator*)malloc(sizeof(NDEMPRCalculator));
-    calc->G = G;
-    calc->dimensions = (int*)malloc(3 * sizeof(int));
-    calc->dimensions[0] = G->dim1;
-    calc->dimensions[1] = G->dim2;
-    calc->dimensions[2] = G->dim3;
-    calc->num_dims = 3;
-
-    calc->support_vectors = (Tensor3D**)malloc(calc->num_dims * sizeof(Tensor3D*));
-    // Destek vektörlerini başlatma (bu örnekte 'ones' kullanıldı)
-    for (int i = 0; i < calc->num_dims; i++) {
-        calc->support_vectors[i] = create_tensor3d(calc->dimensions[i], 1, 1);
-        for (int j = 0; j < calc->dimensions[i]; j++) {
-            calc->support_vectors[i]->data[j] = 1.0;
-        }
-    }
-
-    calc->g0 = 0.0;  // G0 başlangıçta 0.0
-
-    // g_components için yer ayırma
-    calc->g_components = (Tensor3D**)malloc(calc->num_dims * sizeof(Tensor3D*));
-    for (int i = 0; i < calc->num_dims; i++) {
-        calc->g_components[i] = create_tensor3d(calc->dimensions[i], 1, 1);
-    }
-
-    return calc;
-}
-
-// G0 hesaplama
-double calculate_g0(NDEMPRCalculator* calc) {
-    double g0 = 0.0;
-    for (int i = 0; i < calc->G->dim1 * calc->G->dim2 * calc->G->dim3; i++) {
-        g0 += calc->G->data[i];
-    }
-    return g0 / (calc->G->dim1 * calc->G->dim2 * calc->G->dim3);
-}
-
-// EMPR bileşenlerini hesaplama
-void calculate_empr_component(NDEMPRCalculator* calc, int* involved_dims, int involved_dims_size) {
-    // Bu fonksiyon, Python'daki calculate_empr_component fonksiyonuna karşılık gelir.
-    // Python'daki mantığa göre burada tensor çarpımları ve çıkarımlar yapılacaktır.
-}
-
-// Yaklaşık tensor hesaplama
-Tensor3D* calculate_approximation(NDEMPRCalculator* calc, int order) {
-    Tensor3D* approx = create_tensor3d(calc->G->dim1, calc->G->dim2, calc->G->dim3);
-
-    double g0 = calculate_g0(calc);
-
-    // Yaklaşık tensorü g0 ile başlat
-    for (int i = 0; i < calc->G->dim1 * calc->G->dim2 * calc->G->dim3; i++) {
-        approx->data[i] = g0;
-    }
-
-    // EMPR bileşenlerini ekleme
-    for (int i = 0; i < order; i++) {
-        // Burada tensor eklemeleri yapılacaktır
-    }
-
-    return approx;
-}
-
-int main() {
-    // Tensor oluşturma ve rastgele doldurma
-    Tensor3D* G = create_tensor3d(3, 4, 5);
-    fill_tensor3d_random(G);
-
-    // NDEMPRCalculator başlatma
-    NDEMPRCalculator* calculator = init_calculator(G);
-
-    // Yaklaşık tensor hesaplama
-    Tensor3D* approx = calculate_approximation(calculator, 3);
-
-    // Orijinal ve yaklaşık tensorleri yazdırma
-    printf("Original Tensor:\n");
-    print_tensor3d(G);
-
-    printf("Approximation Tensor:\n");
-    print_tensor3d(approx);
-
-    // Belleği serbest bırakma
-    free_tensor3d(G);
-    free_tensor3d(approx);
-    for (int i = 0; i < calculator->num_dims; i++) {
-        free_tensor3d(calculator->support_vectors[i]);
-        free_tensor3d(calculator->g_components[i]);
-    }
-    free(calculator->support_vectors);
-    free(calculator->g_components);
-    free(calculator->dimensions);
-    free(calculator);
+    free_tensor(approximation);
 
     return 0;
 }
