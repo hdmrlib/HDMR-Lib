@@ -132,7 +132,7 @@ class NDEMPRCalculator:
 
         G_component = torch.squeeze(G_component)
         subtracted = torch.squeeze(subtracted)
-        G_component -= subtracted
+        G_component = G_component.clone() - subtracted
 
         self.g_components[self.convert_g_to_string(involved_dims)] = G_component
 
@@ -167,6 +167,30 @@ class NDEMPRCalculator:
                 overall_sum += torch.permute(term, np.argsort(list(g_combination) + s).tolist())
 
         return torch.squeeze(overall_sum)
+
+    def calculate_mse(self, order):
+        """
+        Calculate the Mean Squared Error (MSE) between the original tensor and 
+        the approximated tensor based on the given EMPR order.
+
+        Args:
+        order: int, the order of approximation.
+
+        Returns:
+        mse: float, the mean squared error.
+        """
+        # Calculate the approximation using the given order
+        T_empr = self.calculate_approximation(order)
+
+        # Compute the squared error
+        squared_error = torch.norm(self.G - T_empr, p='fro')
+
+        # Calculate MSE by dividing the squared error by the number of elements in the tensor
+        num_elements = torch.numel(self.G)
+        mse = squared_error / num_elements
+
+
+        return mse.item()  # Return the MSE as a Python float
 
 # Example usage
 torch.manual_seed(0)
