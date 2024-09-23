@@ -192,6 +192,48 @@ class NDEMPRCalculator:
 
         return mse.item()  # Return the MSE as a Python float
 
+    def calculate_sensitivity_ratios(self, order, plot=False):
+    
+            G_component = self.G
+            T_empr = self.calculate_approximation(order)
+            ratios = {}
+            # Compute g0 and add its ratio to the dictionary
+            g0_square = hdmr_calculator.g0 ** 2
+            original_norm_square = torch.norm(G_component) ** 2
+            ratios['g_0'] = (g0_square / original_norm_square) * 100 
+    
+            for i in range(1, order + 1):
+                for g_combination in combinations(np.arange(len(hdmr_calculator.dimensions)), i):
+                    component_name = hdmr_calculator.convert_g_to_string(g_combination)
+                    g_component = hdmr_calculator.g_components[component_name]
+                    # Calculate the ratio for the current component
+                    component_norm_square = torch.norm(g_component) ** 2
+                    ratios[component_name] = (component_norm_square / original_norm_square) * 100  # Yüzde olarak hesapla
+                    # Numpy array of tensor values
+                    values_array = np.array([(component_name, value.item()) for component_name, value in ratios.items()])
+                    # Total percenatage of all components
+                    total_percentage = np.sum([value.item() for value in ratio.values()])
+                    
+            print("Sensivitiy Percentages:\n", values_array)
+            print("Total percentage: %",total_percentage)
+            
+            # Plot if it is True
+            if plot:
+                component_names = list(ratios.keys())
+                component_values = list(ratios.values())
+                plt.figure(figsize=(10, 6))
+                plt.bar(component_names, component_values, color='skyblue')
+                for i, value in enumerate(component_values):
+                    plt.text(i, value, f'{value:.2f}%', ha='center', va='bottom')  
+                plt.xlabel('Components')
+                plt.ylabel('Sensitivity Percentages (%)')
+                plt.title('Component Sensitivity Percentages')
+                plt.xticks(rotation=45)  
+                plt.ylim(0, max(component_values)+10)  
+                plt.grid(axis='y')  
+                plt.show() 
+    
+
 # Example usage
 torch.manual_seed(0)
 G = torch.rand(3, 4, 5)
