@@ -37,9 +37,6 @@ class EMPRBenchmark:
         }
 
     def run_benchmarks(self):
-        """
-        Runs the benchmarks for different backends and stores the results.
-        """
         # NumPy backend benchmark
         G_numpy = np.random.rand(*self.tensor_shape)
         print("Testing with NumPy backend...")
@@ -57,9 +54,6 @@ class EMPRBenchmark:
         self.results['pytorch'] = self.benchmark_empr_calculator('pytorch', G_pytorch)
 
     def display_results(self):
-        """
-        Prints out the benchmark results in a formatted way.
-        """
         print("\nBenchmark Results:")
         for backend, result in self.results.items():
             print(f"\nBackend: {backend}")
@@ -67,14 +61,8 @@ class EMPRBenchmark:
             print(f"Approximation Time: {result['approximation_time']:.4f} seconds")
 
     def plot_results(self, colors=None):
-        """
-        Plots a grouped bar chart for benchmark results where each timing category is grouped,
-        and each backend has a consistent color across groups.
+        # Plots a grouped bar chart for benchmark results where each timing category is grouped,
 
-        Parameters:
-        - colors: Dictionary mapping each backend to a specific color (e.g., {'numpy': 'blue', 'tensorflow': 'green', 'pytorch': 'red'}).
-        """
-        # Define default colors if not provided
         if colors is None:
             colors = {
                 'numpy': '#d4a15a',       # Light gold
@@ -132,7 +120,6 @@ class EMPRBenchmark:
         # Display the bar chart
         plt.tight_layout()  # Ensure the layout is tight and there is no clipping of text
         plt.show()
-
 
 
 
