@@ -6,19 +6,17 @@ import torch
 
 class EMPRBenchmark:
     def __init__(self, tensor_shape=(500, 500, 500), order=3, supports_type='das'):
-        """
-        Initializes the benchmark configuration with the specified tensor shape, approximation order, and support type.
-        """
+        # Initializes the benchmark configuration with the specified tensor shape, approximation order, and support type.
+        
         self.tensor_shape = tensor_shape
         self.order = order
         self.supports_type = supports_type
         self.results = {}
 
     def benchmark_empr_calculator(self, backend, G):
-        """
-        Benchmarks the EMPRCalculator for a specific backend.
-        Records the initialization, approximation, and MSE computation times.
-        """
+        # Benchmarks the EMPRCalculator for a specific backend.
+        # Records the initialization, approximation times.
+
         # Initialization time
         start_time = time.time()
         empr_calculator = NDEMPRCalculator(G, supports=self.supports_type, backend=backend)
@@ -27,6 +25,8 @@ class EMPRBenchmark:
         approximation_start_time = time.time()
         approximation = empr_calculator.calculate_approximation(order=self.order)
         approximation_time = time.time() - approximation_start_time
+        
+        # (??) we can add the decomposition - apprx. and other times (??)
         
         # Total time taken
         total_time = time.time() - start_time
