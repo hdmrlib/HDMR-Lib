@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import torch
+from EMPRwithfourbackends import NDEMPRCalculator
 
 class EMPRBenchmark:
     def __init__(self, tensor_shape=(500, 500, 500), order=3, supports_type='das'):

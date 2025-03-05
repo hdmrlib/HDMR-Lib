@@ -1,17 +1,16 @@
-import torch
+import torch, time
 import tensorflow as tf
 import numpy as np
-import cupy as cp  # Import CuPy for GPU-accelerated operations
 from itertools import combinations
 
 class NDEMPRCalculator:
 
-    def __init__(self, G, supports='das', custom_supports=None, backend='tensorflow'):
+    def __init__(self, G, supports='das', custom_supports=None, backend=None):
         self.backend = backend
 
         # Error handling for unsupported backends
-        if self.backend not in ['tensorflow', 'pytorch', 'numpy', 'cupy']:
-            raise ValueError(f"Unsupported backend: {self.backend}. Supported backends are: 'tensorflow', 'pytorch', 'numpy', and 'cupy'.")
+        if self.backend not in ['tensorflow', 'pytorch', 'numpy']:
+            raise ValueError(f"Unsupported backend: {self.backend}. Supported backends are: 'tensorflow', 'pytorch', and 'numpy'.")
 
         # Convert G to the selected backend's tensor type
         if self.backend == 'tensorflow':
@@ -31,11 +30,6 @@ class NDEMPRCalculator:
                 G = np.array(G, dtype=np.float64)
             except Exception as e:
                 raise ValueError(f"NumPy error when converting G: {e}")
-        elif self.backend == 'cupy':
-            try:
-                G = cp.array(G, dtype=cp.float64)
-            except Exception as e:
-                raise ValueError(f"CuPy error when converting G: {e}")
 
         self.G = G
         self.dimensions = G.shape
@@ -49,7 +43,13 @@ class NDEMPRCalculator:
         if len(self.dimensions) < 2:
             raise ValueError(f"Tensor G must have at least 2 dimensions, but got {len(self.dimensions)} dimensions.")
 
+        start_time = time.time()
         self.calculate_empr_component(np.arange(len(self.dimensions)))
+        self.excution_time = time.time()-start_time
+
+        start_time = time.time()
+        self.calculate_approximation(order=len(self.dimensions))
+        self.approximation_time = time.time()-start_time
 
     def initialize_support_vectors(self, supports):
         support_vectors = []
@@ -65,8 +65,6 @@ class NDEMPRCalculator:
                             temp = torch.mean(temp, ind)
                         elif self.backend == 'numpy':
                             temp = np.mean(temp, axis=ind)
-                        elif self.backend == 'cupy':
-                            temp = cp.mean(temp, axis=ind)
                     else:
                         ind += 1
                 if self.backend == 'tensorflow':
@@ -75,8 +73,6 @@ class NDEMPRCalculator:
                     temp = torch.unsqueeze(temp, -1)
                 elif self.backend == 'numpy':
                     temp = np.expand_dims(temp, axis=-1)
-                elif self.backend == 'cupy':
-                    temp = cp.expand_dims(temp, axis=-1)
                 support_vectors.append(temp)
 
         elif supports == 'ones':
@@ -87,8 +83,6 @@ class NDEMPRCalculator:
                     s = torch.ones(dim_size, 1, dtype=torch.float64)
                 elif self.backend == 'numpy':
                     s = np.ones((dim_size, 1), dtype=np.float64)
-                elif self.backend == 'cupy':
-                    s = cp.ones((dim_size, 1), dtype=cp.float64)
                 support_vectors.append(s)
 
         elif supports == 'custom':
@@ -103,8 +97,6 @@ class NDEMPRCalculator:
                     support_vectors.append(tf.convert_to_tensor(w, dtype=tf.float64))
                 elif self.backend == 'pytorch':
                     support_vectors.append(torch.tensor(w, dtype=torch.float64))
-                elif self.backend == 'cupy':
-                    support_vectors.append(cp.array(w, dtype=cp.float64))
 
         return support_vectors
 
@@ -118,8 +110,6 @@ class NDEMPRCalculator:
                     g0 = torch.tensordot(g0, s, dims=([0], [0])) * w
                 elif self.backend == 'numpy':
                     g0 = np.tensordot(g0, s, axes=([0], [0])) * w
-                elif self.backend == 'cupy':
-                    g0 = cp.tensordot(g0, s, axes=([0], [0])) * w
             except Exception as e:
                 raise ValueError(f"Error during tensordot operation in calculate_g0: {e}")
 
@@ -128,8 +118,6 @@ class NDEMPRCalculator:
             return g0.numpy()
         elif self.backend == 'pytorch':
             return g0.item()
-        elif self.backend == 'cupy':
-            return g0
         elif self.backend == 'numpy':
             return g0
 
@@ -145,7 +133,7 @@ class NDEMPRCalculator:
 
     def calculate_empr_component(self, involved_dims):
         """
-        This handles the calculation of EMPR components for NumPy, CuPy, TensorFlow, and PyTorch.
+        This handles the calculation of EMPR components for NumPy, TensorFlow, and PyTorch.
         """
         try:
             self.check_required_components(involved_dims)
@@ -161,20 +149,13 @@ class NDEMPRCalculator:
                             G_component = torch.tensordot(G_component, s, dims=([ind], [0])) * w
                         elif self.backend == 'numpy':
                             G_component = np.tensordot(G_component, s, axes=([ind], [0])) * w
-                        elif self.backend == 'cupy':
-                            G_component = cp.tensordot(G_component, s, axes=([ind], [0])) * w
                     except Exception as e:
                         raise ValueError(f"Error during tensordot operation in calculate_empr_component for backend {self.backend}: {e}")
                 else:
                     ind += 1
 
             # Subtraction part for each backend
-            if self.backend == 'cupy':
-                g0_cupy = cp.array(self.g0) if not isinstance(self.g0, cp.ndarray) else self.g0
-                subtracted = cp.squeeze(self.support_vectors[involved_dims[0]] * g0_cupy)
-                for i in range(1, len(involved_dims)):
-                    subtracted = cp.einsum('...i,jk->...ij', subtracted, self.support_vectors[involved_dims[i]])
-            elif self.backend == 'tensorflow':
+            if self.backend == 'tensorflow':
                 subtracted = tf.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
                 for i in range(1, len(involved_dims)):
                     subtracted = tf.einsum('...i,jk->...ij', subtracted, self.support_vectors[involved_dims[i]])
@@ -204,8 +185,6 @@ class NDEMPRCalculator:
                                     term = torch.einsum('...i, jk->...ij', term, self.support_vectors[s[k]])
                                 elif self.backend == 'numpy':
                                     term = np.einsum('...i,jk->...ij', term, self.support_vectors[s[k]])
-                                elif self.backend == 'cupy':
-                                    term = cp.einsum('...i,jk->...ij', term, self.support_vectors[s[k]])
                             except Exception as e:
                                 raise ValueError(f"Error during einsum operation for higher-order term in {self.backend}: {e}")
                         if self.backend == 'tensorflow':
@@ -214,8 +193,6 @@ class NDEMPRCalculator:
                             subtracted += torch.permute(term, np.argsort(list(g_combination) + s).tolist())
                         elif self.backend == 'numpy':
                             subtracted += np.transpose(term, axes=np.argsort(list(g_combination) + s))
-                        elif self.backend == 'cupy':
-                            subtracted += cp.transpose(term, axes=np.argsort(list(g_combination) + s))
 
             # Finalize the component calculation
             if self.backend == 'tensorflow':
@@ -230,10 +207,6 @@ class NDEMPRCalculator:
                 G_component = np.squeeze(G_component)
                 subtracted = np.squeeze(subtracted)
                 G_component = np.copy(G_component) - subtracted
-            elif self.backend == 'cupy':
-                G_component = cp.squeeze(G_component)
-                subtracted = cp.squeeze(subtracted)
-                G_component = cp.copy(G_component) - subtracted
 
             self.g_components[self.convert_g_to_string(involved_dims)] = G_component
 
@@ -244,11 +217,7 @@ class NDEMPRCalculator:
     def calculate_approximation(self, order):
         try:
             involved_dims = np.arange(len(self.dimensions))
-            if self.backend == 'cupy':
-                g0_cupy = cp.array(self.g0) if not isinstance(self.g0, cp.ndarray) else self.g0
-                overall_sum = self.support_vectors[involved_dims[0]] * g0_cupy
-            else:
-                overall_sum = self.support_vectors[involved_dims[0]] * self.g0
+            overall_sum = self.support_vectors[involved_dims[0]] * self.g0
 
             for i in range(1, len(involved_dims)):
                 if self.backend == 'tensorflow':
@@ -257,8 +226,6 @@ class NDEMPRCalculator:
                     overall_sum = torch.einsum('...i, jk->...ij', overall_sum, self.support_vectors[involved_dims[i]])
                 elif self.backend == 'numpy':
                     overall_sum = np.einsum('...i,jk->...ij', overall_sum, self.support_vectors[involved_dims[i]])
-                elif self.backend == 'cupy':
-                    overall_sum = cp.einsum('...i,jk->...ij', overall_sum, self.support_vectors[involved_dims[i]])
 
             # Ensure no extra dimensions
             if self.backend == 'tensorflow':
@@ -267,8 +234,6 @@ class NDEMPRCalculator:
                 overall_sum = torch.squeeze(overall_sum)
             elif self.backend == 'numpy':
                 overall_sum = np.squeeze(overall_sum)
-            elif self.backend == 'cupy':
-                overall_sum = cp.squeeze(overall_sum)
 
             # Additional terms for higher order approximations
             for i in range(1, order + 1):
@@ -282,8 +247,6 @@ class NDEMPRCalculator:
                             term = torch.einsum('...i, jk->...ij', term, self.support_vectors[s[k]])
                         elif self.backend == 'numpy':
                             term = np.einsum('...i,jk->...ij', term, self.support_vectors[s[k]])
-                        elif self.backend == 'cupy':
-                            term = cp.einsum('...i,jk->...ij', term, self.support_vectors[s[k]])
 
                     # Ensure correct ordering and dimensionality
                     if self.backend == 'tensorflow':
@@ -295,9 +258,6 @@ class NDEMPRCalculator:
                     elif self.backend == 'numpy':
                         term = np.transpose(term, axes=np.argsort(list(g_combination) + s))
                         overall_sum += np.squeeze(term)
-                    elif self.backend == 'cupy':
-                        term = cp.transpose(term, axes=np.argsort(list(g_combination) + s))
-                        overall_sum += cp.squeeze(term)
 
             if self.backend == 'tensorflow':
                 return tf.squeeze(overall_sum)
@@ -305,9 +265,7 @@ class NDEMPRCalculator:
                 return torch.squeeze(overall_sum)
             elif self.backend == 'numpy':
                 return np.squeeze(overall_sum)
-            elif self.backend == 'cupy':
-                return cp.squeeze(overall_sum)
-
+            
         except Exception as e:
             raise RuntimeError(f"Error in calculate_approximation: {e}")
 
@@ -326,10 +284,6 @@ class NDEMPRCalculator:
                 squared_error = np.linalg.norm((self.G - T_empr).flatten(), ord=2)
                 mse = squared_error / np.size(self.G)
                 return mse
-            elif self.backend == 'cupy':
-                squared_error = cp.linalg.norm((self.G - T_empr).flatten(), ord=2)
-                mse = squared_error / cp.size(self.G)
-                return cp.asnumpy(mse)
         except Exception as e:
             raise RuntimeError(f"Error in calculate_mse: {e}")
 """
@@ -390,24 +344,4 @@ print(G)
 # Calculate the MSE for the approximation of order 3
 mse = empr_calculator.calculate_mse(order=7)
 print("Mean Squared Error:", mse)
-"""
-
-
-"""
-# Example usage for CuPy backend
-G = np.random.rand(3, 4, 5)  # You can load your data here
-
-empr_calculator = NDEMPRCalculator(G, supports='das', backend='cupy')
-
-# Calculate approximation
-print("Original:")
-print(G)
-print("Approximation (Order 3):")
-approximation = empr_calculator.calculate_approximation(order=3)
-print(cp.asnumpy(approximation))  # Convert CuPy to NumPy for printing
-
-# Calculate the MSE for the approximation of order 3
-mse = empr_calculator.calculate_mse(order=4)
-print("Mean Squared Error:", mse)
-
 """
