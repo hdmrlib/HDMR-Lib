@@ -1,3 +1,5 @@
+import threading, subprocess, time, psutil
+
 def monitor_idle_gpu_cpu(duration=10, interval=1):
     
     power_values = []
@@ -26,8 +28,6 @@ def monitor_idle_gpu_cpu(duration=10, interval=1):
     avg_cpu_util = sum(cpu_util_values) / len(cpu_util_values)
     
     return avg_power, avg_gpu_util, avg_cpu_util
-
-import threading, subprocess, time, psutil
 
 avg_time = 10
 avg_power, avg_gpu_util, avg_cpu_util = monitor_idle_gpu_cpu(duration=avg_time)
