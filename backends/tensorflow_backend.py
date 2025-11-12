@@ -19,7 +19,7 @@ class TensorFlowBackend(BaseBackend):
 
         def initialize_weights(self, weight):
             weights = []
-            if weight == 'average':
+            if weight == 'average' or weight == 'avg':
                 for dim_size in self.dimensions:
                     w = tf.ones((dim_size, 1), dtype=tf.float64)
                     l2_norm = tf.norm(w, ord=2)
@@ -121,10 +121,10 @@ class TensorFlowBackend(BaseBackend):
                         for k in range(len(s)):
                             term = tf.einsum('...i,jk->...ij', term, 
                                            (self.support_vectors[s[k]] * self.weights[s[k]]))
-                        subtracted += tf.transpose(term, perm=np.argsort(list(g_combination) + s).tolist())
+                        subtracted += tf.transpose(term, perm=np.argsort(list(g_combination) + s))
             G_component = tf.squeeze(G_component)
             subtracted = tf.squeeze(subtracted)
-            G_component = tf.identity(G_component) - subtracted
+            G_component = G_component - subtracted
             self.g_components[self.convert_g_to_string(involved_dims)] = G_component
 
         def calculate_approximation(self, order):
@@ -142,14 +142,14 @@ class TensorFlowBackend(BaseBackend):
                     for k in range(len(s)):
                         term = tf.einsum('...i,jk->...ij', term, 
                                        (self.support_vectors[s[k]] * self.weights[s[k]]))
-                    overall_sum += tf.transpose(term, perm=np.argsort(list(g_combination) + s).tolist())
+                    overall_sum += tf.transpose(term, perm=np.argsort(list(g_combination) + s))
             return tf.squeeze(overall_sum)
 
         def calculate_mse(self, order):
             T_empr = self.calculate_approximation(order)
-            squared_error = tf.norm(self.G - T_empr, ord='euclidean')
-            num_elements = tf.size(self.G, out_type=tf.float64)
-            mse = squared_error / num_elements
+            squared_error = tf.norm(self.G - T_empr, ord='fro')
+            num_elements = tf.size(self.G)
+            mse = squared_error / tf.cast(num_elements, tf.float64)
             return float(mse)
 
     # EMPR implementation
@@ -232,10 +232,10 @@ class TensorFlowBackend(BaseBackend):
                         for k in range(len(s)):
                             term = tf.einsum('...i,jk->...ij', term, 
                                            self.support_vectors[s[k]])
-                        subtracted += tf.transpose(term, perm=np.argsort(list(g_combination) + s).tolist())
+                        subtracted += tf.transpose(term, perm=tuple(np.argsort(list(g_combination) + s)))
             G_component = tf.squeeze(G_component)
             subtracted = tf.squeeze(subtracted)
-            G_component = tf.identity(G_component) - subtracted
+            G_component = G_component - subtracted
             self.g_components[self.convert_g_to_string(involved_dims)] = G_component
 
         def calculate_approximation(self, order):
@@ -253,14 +253,14 @@ class TensorFlowBackend(BaseBackend):
                     for k in range(len(s)):
                         term = tf.einsum('...i,jk->...ij', term, 
                                        self.support_vectors[s[k]])
-                    overall_sum += tf.transpose(term, perm=np.argsort(list(g_combination) + s).tolist())
+                    overall_sum += tf.transpose(term, perm=tuple(np.argsort(list(g_combination) + s)))
             return tf.squeeze(overall_sum)
 
         def calculate_mse(self, order):
             T_empr = self.calculate_approximation(order)
-            squared_error = tf.norm(self.G - T_empr, ord='euclidean')
-            num_elements = tf.size(self.G, out_type=tf.float64)
-            mse = squared_error / num_elements
+            squared_error = tf.norm(self.G - T_empr, ord=2)
+            num_elements = tf.size(self.G)
+            mse = squared_error / tf.cast(num_elements, tf.float64)
             return float(mse)
 
     def hdmr_decompose(self, tensor, order=2, **kwargs):
@@ -269,4 +269,30 @@ class TensorFlowBackend(BaseBackend):
 
     def empr_decompose(self, tensor, order=2, **kwargs):
         model = self._EMPR(tensor, **kwargs)
-        return model.calculate_approximation(order) 
+        return model.calculate_approximation(order)
+
+    def hdmr_components(self, tensor, max_order=None, **kwargs):
+        model = self._HDMR(tensor, **kwargs)
+        num_dims = len(model.dimensions)
+        if max_order is None:
+            max_order = num_dims
+        components = {}
+        dims = list(range(num_dims))
+        for r in range(1, min(max_order, num_dims) + 1):
+            for comb in combinations(dims, r):
+                key = 'g' + ''.join(str(i+1) for i in comb)
+                components[key] = model.g_components[model.convert_g_to_string(comb)]
+        return components
+
+    def empr_components(self, tensor, max_order=None, **kwargs):
+        model = self._EMPR(tensor, **kwargs)
+        num_dims = len(model.dimensions)
+        if max_order is None:
+            max_order = num_dims
+        components = {}
+        dims = list(range(num_dims))
+        for r in range(1, min(max_order, num_dims) + 1):
+            for comb in combinations(dims, r):
+                key = 'g' + ''.join(str(i+1) for i in comb)
+                components[key] = model.g_components[model.convert_g_to_string(comb)]
+        return components 

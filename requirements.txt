@@ -1,0 +1,6 @@
+# Core
+numpy>=1.22
+
+# Backends (CPU-only)
+torch>=2.2
+tensorflow>=2.14 

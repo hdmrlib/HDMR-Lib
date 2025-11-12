@@ -23,7 +23,7 @@ class TorchBackend(BaseBackend):
 
         def initialize_weights(self, weight):
             weights = []
-            if weight == 'average':
+            if weight == 'average' or weight == 'avg':
                 for dim_size in self.dimensions:
                     w = torch.ones(dim_size, 1, dtype=torch.float64)
                     l2_norm = torch.norm(w, p=2)
@@ -248,7 +248,7 @@ class TorchBackend(BaseBackend):
             overall_sum = torch.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 overall_sum = torch.einsum('...i,jk->...ij', overall_sum, 
-                                         self.support_vectors[involved_dims[i]])
+                                      self.support_vectors[involved_dims[i]])
             # Second-N'th part
             for i in range(1, order+1):
                 for g_combination in combinations(involved_dims, i):
@@ -273,4 +273,30 @@ class TorchBackend(BaseBackend):
 
     def empr_decompose(self, tensor, order=2, **kwargs):
         model = self._EMPR(tensor, **kwargs)
-        return model.calculate_approximation(order) 
+        return model.calculate_approximation(order)
+
+    def hdmr_components(self, tensor, max_order=None, **kwargs):
+        model = self._HDMR(tensor, **kwargs)
+        num_dims = len(model.dimensions)
+        if max_order is None:
+            max_order = num_dims
+        components = {}
+        dims = list(range(num_dims))
+        for r in range(1, min(max_order, num_dims) + 1):
+            for comb in combinations(dims, r):
+                key = 'g' + ''.join(str(i+1) for i in comb)
+                components[key] = model.g_components[model.convert_g_to_string(comb)]
+        return components
+
+    def empr_components(self, tensor, max_order=None, **kwargs):
+        model = self._EMPR(tensor, **kwargs)
+        num_dims = len(model.dimensions)
+        if max_order is None:
+            max_order = num_dims
+        components = {}
+        dims = list(range(num_dims))
+        for r in range(1, min(max_order, num_dims) + 1):
+            for comb in combinations(dims, r):
+                key = 'g' + ''.join(str(i+1) for i in comb)
+                components[key] = model.g_components[model.convert_g_to_string(comb)]
+        return components 
