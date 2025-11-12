@@ -4,6 +4,17 @@ from itertools import combinations
 from .base import BaseBackend
 
 class TensorFlowBackend(BaseBackend):
+    def __init__(self):
+        """Initialize TensorFlowBackend with device selection."""
+        # TensorFlow automatically uses GPU if available
+        self.gpus = tf.config.list_physical_devices('GPU')
+        if self.gpus:
+            try:
+                # Enable memory growth to avoid allocating all GPU memory
+                for gpu in self.gpus:
+                    tf.config.experimental.set_memory_growth(gpu, True)
+            except RuntimeError as e:
+                print(f"GPU configuration error: {e}")
     # HDMR implementation
     class _HDMR:
         def __init__(self, G, weight="avg", custom_weights=None, supports='ones', custom_supports=None):

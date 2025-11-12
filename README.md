@@ -1,14 +1,14 @@
-# HDMR-PRO-SEN
+# HDMR-Lib
 
 **High Dimensional Model Representation and Enhanced Multivariate Products Representation**
 
-A powerful Python library for tensor decomposition using HDMR and EMPR methods with multi-backend support (NumPy, PyTorch, TensorFlow, CuPy).
+A powerful Python library for tensor decomposition using HDMR and EMPR methods with multi-backend support (NumPy, PyTorch, TensorFlow).
 
 ---
 
-## 🎯 **What is HDMR-PRO-SEN?**
+## 🎯 **What is HDMR-Lib?**
 
-HDMR-PRO-SEN implements two state-of-the-art tensor decomposition methods:
+HDMR-Lib implements two state-of-the-art tensor decomposition methods:
 
 - **HDMR (High Dimensional Model Representation)**: Decomposes multivariate functions into hierarchical components with weighted support vectors
 - **EMPR (Enhanced Multivariate Products Representation)**: An optimized variant using unweighted support vectors for better computational efficiency
@@ -27,8 +27,8 @@ Both methods represent complex multivariate functions as sums of lower-dimension
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/your-username/HDMR-PRO-SEN.git
-cd HDMR-PRO-SEN
+git clone https://github.com/your-username/HDMR-Lib.git
+cd HDMR-Lib
 ```
 
 2. **Create virtual environment:**
@@ -41,6 +41,23 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```bash
 pip install -r requirements.txt
 ```
+
+### GPU Acceleration (Optional)
+
+For CUDA/GPU support:
+
+```bash
+# PyTorch with CUDA
+pip install torch --index-url https://download.pytorch.org/whl/cu118  # CUDA 11.8
+
+# TensorFlow (GPU support included)
+pip install tensorflow
+```
+
+**Requirements:**
+- NVIDIA GPU with CUDA capability
+- CUDA Toolkit (11.8 or 12.1)
+- cuDNN library
 
 ### Basic Usage
 
@@ -76,7 +93,7 @@ print(f"Available components: {list(empr_components.keys())}")
 
 ### 1. **Backend Selection**
 
-HDMR-PRO-SEN supports multiple computational backends:
+HDMR-Lib supports multiple computational backends:
 
 ```python
 from backends import set_backend, get_backend
@@ -85,7 +102,6 @@ from backends import set_backend, get_backend
 set_backend('numpy')      # NumPy (default, always available)
 set_backend('torch')      # PyTorch (requires torch>=2.2)  
 set_backend('tensorflow') # TensorFlow (requires tensorflow>=2.14)
-set_backend('cupy')       # CuPy (GPU acceleration, EMPR only)
 
 # Check current backend
 print(f"Current backend: {get_backend()}")
@@ -238,17 +254,11 @@ training_data = expensive_function(x, y, z)
 surrogate = EMPR(training_data, supports='das')
 
 # Test approximation quality at different orders
-test_x, test_y, test_z = np.meshgrid(np.linspace(0, 1, 5), np.linspace(0, 1, 5), np.linspace(0, 1, 5), indexing='ij')
-test_exact = expensive_function(test_x, test_y, test_z)
-
 for order in [1, 2, 3]:
-    # Note: This is a simplified example - proper interpolation would be needed for new points
     approx = surrogate.decompose(order=order)
     
-    # For demonstration, compare on training grid subset
-    subset = training_data[:5, :5, :5]
-    approx_subset = approx[:5, :5, :5]
-    error = np.mean((subset - approx_subset) ** 2)
+    # Compare on training grid
+    error = np.mean((training_data - approx) ** 2)
     print(f"Order {order} approximation MSE: {error:.6e}")
 ```
 
@@ -260,14 +270,14 @@ Optimize performance for large tensors:
 # For large tensors, use appropriate backend
 tensor_large = np.random.rand(20, 20, 20)
 
-# GPU acceleration with CuPy (if available)
+# Try PyTorch backend for potential GPU acceleration
 try:
-    set_backend('cupy')
-    model_gpu = EMPR(tensor_large)
-    result_gpu = model_gpu.decompose(order=2)
-    print("CuPy GPU acceleration successful")
+    set_backend('torch')
+    model_torch = EMPR(tensor_large)
+    result_torch = model_torch.decompose(order=2)
+    print("PyTorch backend successful")
 except:
-    print("CuPy not available, using NumPy")
+    print("PyTorch not available, using NumPy")
     set_backend('numpy')
     model_cpu = EMPR(tensor_large)
     result_cpu = model_cpu.decompose(order=2)
@@ -300,10 +310,9 @@ F(x₁,x₂,x₃) ≈ f₀ + g₁(x₁) + g₂(x₂) + g₃(x₃) + g₁₂(x₁
 ## 🎯 **Best Practices**
 
 ### 1. **Backend Selection**
-- **NumPy**: Default choice, good for most applications
-- **PyTorch**: Better for integration with deep learning workflows
-- **TensorFlow**: Good for large-scale distributed computing
-- **CuPy**: GPU acceleration for EMPR (significant speedup for large tensors)
+- **NumPy**: Default choice, good for most applications (CPU only)
+- **PyTorch**: Better for integration with deep learning workflows (CPU/GPU)
+- **TensorFlow**: Good for large-scale distributed computing (CPU/GPU)
 
 ### 2. **Support Vector Choice**
 - **DAS (Data-Adaptive Supports)**: Usually provides best approximation quality
@@ -419,8 +428,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 📞 **Support**
 
 - 📧 Email: [your-email@domain.com]
-- 🐛 Issues: [GitHub Issues](https://github.com/your-username/HDMR-PRO-SEN/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/your-username/HDMR-PRO-SEN/discussions)
+- 🐛 Issues: [GitHub Issues](https://github.com/your-username/HDMR-Lib/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/your-username/HDMR-Lib/discussions)
 
 ---
 

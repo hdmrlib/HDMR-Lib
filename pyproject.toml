@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hdmr-lib"
+version = "0.1.0"
+description = "High Dimensional Model Representation (HDMR) and Enhanced Multivariate Products Representation (EMPR) library"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+keywords = ["hdmr", "empr", "tensor", "decomposition", "sensitivity-analysis"]
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "numpy>=1.22",
+]
+
+[project.optional-dependencies]
+torch = ["torch>=2.2"]
+tensorflow = ["tensorflow>=2.14"]
+all = ["torch>=2.2", "tensorflow>=2.14"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "matplotlib>=3.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/HDMR-Lib"
+Documentation = "https://github.com/yourusername/HDMR-Lib#readme"
+Repository = "https://github.com/yourusername/HDMR-Lib"
+"Bug Tracker" = "https://github.com/yourusername/HDMR-Lib/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["hdmr", "empr", "backends", "metrics"]
+omit = ["*/tests/*", "*/examples/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+

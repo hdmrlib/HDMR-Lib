@@ -12,7 +12,3 @@ class EMPR:
     def components(self, max_order=None):
         backend = get_backend_instance()
         return backend.empr_components(self.tensor, max_order=max_order, **self.kwargs)
-
-    def mse(self):
-        # (Optional) Return mean squared error
-        pass 

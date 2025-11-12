@@ -4,13 +4,15 @@ from itertools import combinations
 from .base import BaseBackend
 
 class TorchBackend(BaseBackend):
+    def __init__(self):
+        """Initialize TorchBackend with device selection."""
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    
     # HDMR implementation
     class _HDMR:
-        def __init__(self, G, weight="avg", custom_weights=None, supports='ones', custom_supports=None):
-            if torch.cuda.is_available():
-                G = torch.tensor(G, dtype=torch.float64).to('cuda')
-            else:
-                G = torch.tensor(G, dtype=torch.float64)
+        def __init__(self, G, weight="avg", custom_weights=None, supports='ones', custom_supports=None, device='cpu'):
+            self.device = device
+            G = torch.tensor(G, dtype=torch.float64).to(device)
             self.G = G
             self.dimensions = G.shape
             self.custom_supports = custom_supports
@@ -25,7 +27,7 @@ class TorchBackend(BaseBackend):
             weights = []
             if weight == 'average' or weight == 'avg':
                 for dim_size in self.dimensions:
-                    w = torch.ones(dim_size, 1, dtype=torch.float64)
+                    w = torch.ones(dim_size, 1, dtype=torch.float64, device=self.device)
                     l2_norm = torch.norm(w, p=2)
                     modified_w = (w * (dim_size ** 0.5)) / l2_norm
                     weights.append(modified_w / dim_size)
@@ -36,17 +38,19 @@ class TorchBackend(BaseBackend):
                     raise ValueError("The number of custom weights must match the number of dimensions.")
                 for w in self.custom_weights:
                     if not torch.is_tensor(w):
-                        w = torch.tensor(w, dtype=torch.float64)
+                        w = torch.tensor(w, dtype=torch.float64, device=self.device)
+                    else:
+                        w = w.to(self.device)
                     weights.append(w)
             elif weight == 'gaussian':
                 for dim_size in self.dimensions:
-                    w = torch.randn(dim_size, 1, dtype=torch.float64)
+                    w = torch.randn(dim_size, 1, dtype=torch.float64, device=self.device)
                     l2_norm = torch.norm(w, p=2)
                     modified_w = (w * (dim_size ** 0.5)) / l2_norm
                     weights.append(modified_w / dim_size)
             elif weight == 'chebyshev':
                 for dim_size in self.dimensions:
-                    k = torch.arange(1, dim_size + 1, dtype=torch.float64)
+                    k = torch.arange(1, dim_size + 1, dtype=torch.float64, device=self.device)
                     w = torch.cos((2 * k - 1) * np.pi / (2 * dim_size))
                     w = w.view(dim_size, 1)
                     l2_norm = torch.norm(w, p=2)
@@ -69,7 +73,7 @@ class TorchBackend(BaseBackend):
                     support_vectors.append(temp)
             elif supports == 'ones':
                 for dim_size in self.dimensions:
-                    s = torch.ones(dim_size, 1, dtype=torch.float64)
+                    s = torch.ones(dim_size, 1, dtype=torch.float64, device=self.device)
                     l2_norm = torch.norm(s, p=2)
                     modified_s = (s * (dim_size ** 0.5)) / l2_norm
                     support_vectors.append(modified_s)
@@ -80,7 +84,9 @@ class TorchBackend(BaseBackend):
                     raise ValueError("The number of custom supports must match the number of dimensions.")
                 for s in self.custom_supports:
                     if not torch.is_tensor(s):
-                        s = torch.tensor(s, dtype=torch.float64)
+                        s = torch.tensor(s, dtype=torch.float64, device=self.device)
+                    else:
+                        s = s.to(self.device)
                     support_vectors.append(s)
             return support_vectors
 
@@ -158,8 +164,9 @@ class TorchBackend(BaseBackend):
 
     # EMPR implementation
     class _EMPR:
-        def __init__(self, G, supports='das', custom_supports=None):
-            self.G = torch.tensor(G, dtype=torch.float64)
+        def __init__(self, G, supports='das', custom_supports=None, device='cpu'):
+            self.device = device
+            self.G = torch.tensor(G, dtype=torch.float64, device=device)
             self.dimensions = G.shape
             self.custom_supports = custom_supports
             self.support_vectors = self.initialize_support_vectors(supports)
@@ -182,7 +189,7 @@ class TorchBackend(BaseBackend):
                     support_vectors.append(temp)
             elif supports == 'ones':
                 for dim_size in self.dimensions:
-                    s = torch.ones((dim_size, 1), dtype=torch.float64)
+                    s = torch.ones((dim_size, 1), dtype=torch.float64, device=self.device)
                     support_vectors.append(s)
             elif supports == 'custom':
                 if self.custom_supports is None:
@@ -191,7 +198,9 @@ class TorchBackend(BaseBackend):
                     raise ValueError("The number of custom supports must match the number of dimensions.")
                 for s in self.custom_supports:
                     if not isinstance(s, torch.Tensor):
-                        s = torch.tensor(s, dtype=torch.float64)
+                        s = torch.tensor(s, dtype=torch.float64, device=self.device)
+                    else:
+                        s = s.to(self.device)
                     support_vectors.append(s)
             return support_vectors
 
@@ -268,15 +277,15 @@ class TorchBackend(BaseBackend):
             return float(mse)
 
     def hdmr_decompose(self, tensor, order=2, **kwargs):
-        model = self._HDMR(tensor, **kwargs)
+        model = self._HDMR(tensor, device=self.device, **kwargs)
         return model.calculate_approximation(order)
 
     def empr_decompose(self, tensor, order=2, **kwargs):
-        model = self._EMPR(tensor, **kwargs)
+        model = self._EMPR(tensor, device=self.device, **kwargs)
         return model.calculate_approximation(order)
 
     def hdmr_components(self, tensor, max_order=None, **kwargs):
-        model = self._HDMR(tensor, **kwargs)
+        model = self._HDMR(tensor, device=self.device, **kwargs)
         num_dims = len(model.dimensions)
         if max_order is None:
             max_order = num_dims
@@ -289,7 +298,7 @@ class TorchBackend(BaseBackend):
         return components
 
     def empr_components(self, tensor, max_order=None, **kwargs):
-        model = self._EMPR(tensor, **kwargs)
+        model = self._EMPR(tensor, device=self.device, **kwargs)
         num_dims = len(model.dimensions)
         if max_order is None:
             max_order = num_dims

@@ -13,11 +13,6 @@ try:
 except Exception:
 	TensorFlowBackend = None
 
-try:
-	from .cupy_backend import CuPyBackend
-except Exception:
-	CuPyBackend = None
-
 _BACKEND_MAP = {}
 if NumPyBackend is not None:
 	_BACKEND_MAP['numpy'] = NumPyBackend()
@@ -25,9 +20,6 @@ if TorchBackend is not None:
 	_BACKEND_MAP['torch'] = TorchBackend()
 if TensorFlowBackend is not None:
 	_BACKEND_MAP['tensorflow'] = TensorFlowBackend()
-if CuPyBackend is not None:
-	# HDMR not implemented for CuPy, but EMPR is available
-	_BACKEND_MAP['cupy'] = CuPyBackend()
 
 _CURRENT_BACKEND = 'numpy' if 'numpy' in _BACKEND_MAP else (next(iter(_BACKEND_MAP.keys()), None))
 

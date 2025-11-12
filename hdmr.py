@@ -12,7 +12,3 @@ class HDMR:
     def components(self, max_order=None):
         backend = get_backend_instance()
         return backend.hdmr_components(self.tensor, max_order=max_order, **self.kwargs)
-
-    def sensitivity(self):
-        # (Optional) Return sensitivity indices
-        pass 
