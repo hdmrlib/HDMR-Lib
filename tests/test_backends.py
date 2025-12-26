@@ -49,7 +49,16 @@ def test_numpy_backend():
     assert_(isinstance(empr_result, np.ndarray))
 
 
-@pytest.mark.skipif(True, reason="Only run if torch is installed")
+def _is_torch_available():
+    """Check if PyTorch is available."""
+    try:
+        import torch
+        return True
+    except ImportError:
+        return False
+
+
+@pytest.mark.skipif(not _is_torch_available(), reason="PyTorch is not installed")
 def test_torch_backend():
     """Test for PyTorch backend"""
     try:
@@ -70,7 +79,16 @@ def test_torch_backend():
     assert_(empr_result is not None)
 
 
-@pytest.mark.skipif(True, reason="Only run if tensorflow is installed")
+def _is_tensorflow_available():
+    """Check if TensorFlow is available."""
+    try:
+        import tensorflow
+        return True
+    except ImportError:
+        return False
+
+
+@pytest.mark.skipif(not _is_tensorflow_available(), reason="TensorFlow is not installed")
 def test_tensorflow_backend():
     """Test for TensorFlow backend"""
     try:

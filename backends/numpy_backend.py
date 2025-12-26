@@ -83,7 +83,7 @@ class NumPyBackend(BaseBackend):
             g0 = self.G
             for i, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
                 g0 = np.tensordot(g0, s * w, axes=([0], [0]))
-            return float(g0)
+            return float(np.squeeze(g0))
 
         def convert_g_to_string(self, dims):
             return 'g_' + ','.join(map(str, list(map(lambda x: x+1, dims))))
@@ -194,7 +194,7 @@ class NumPyBackend(BaseBackend):
             g0 = self.G
             for i, s in enumerate(self.support_vectors):
                 g0 = np.tensordot(g0, s, axes=([0], [0]))
-            return float(g0)
+            return float(np.squeeze(g0))
 
         def convert_g_to_string(self, dims):
             return 'g_' + ','.join(map(str, list(map(lambda x: x+1, dims))))
@@ -279,8 +279,8 @@ class NumPyBackend(BaseBackend):
         dims = list(range(num_dims))
         for r in range(1, min(max_order, num_dims) + 1):
             for comb in combinations(dims, r):
-                key = 'g' + ''.join(str(i+1) for i in comb)
-                components[key] = model.g_components[model.convert_g_to_string(comb)]
+                key = model.convert_g_to_string(comb)
+                components[key] = model.g_components[key]
         return components
 
     def empr_components(self, tensor, max_order=None, **kwargs):
@@ -292,6 +292,6 @@ class NumPyBackend(BaseBackend):
         dims = list(range(num_dims))
         for r in range(1, min(max_order, num_dims) + 1):
             for comb in combinations(dims, r):
-                key = 'g' + ''.join(str(i+1) for i in comb)
-                components[key] = model.g_components[model.convert_g_to_string(comb)]
+                key = model.convert_g_to_string(comb)
+                components[key] = model.g_components[key]
         return components 

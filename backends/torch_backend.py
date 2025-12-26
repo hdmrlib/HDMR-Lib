@@ -293,8 +293,8 @@ class TorchBackend(BaseBackend):
         dims = list(range(num_dims))
         for r in range(1, min(max_order, num_dims) + 1):
             for comb in combinations(dims, r):
-                key = 'g' + ''.join(str(i+1) for i in comb)
-                components[key] = model.g_components[model.convert_g_to_string(comb)]
+                key = model.convert_g_to_string(comb)
+                components[key] = model.g_components[key]
         return components
 
     def empr_components(self, tensor, max_order=None, **kwargs):
@@ -306,6 +306,6 @@ class TorchBackend(BaseBackend):
         dims = list(range(num_dims))
         for r in range(1, min(max_order, num_dims) + 1):
             for comb in combinations(dims, r):
-                key = 'g' + ''.join(str(i+1) for i in comb)
-                components[key] = model.g_components[model.convert_g_to_string(comb)]
+                key = model.convert_g_to_string(comb)
+                components[key] = model.g_components[key]
         return components 
