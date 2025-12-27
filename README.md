@@ -426,11 +426,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 ## 📞 **Support**
-
-- 📧 Email: [your-email@domain.com]
 - 🐛 Issues: [GitHub Issues](https://github.com/your-username/HDMR-Lib/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/your-username/HDMR-Lib/discussions)
 
 ---
 
 **Made with ❤️ for the scientific computing community**
+
