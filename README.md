@@ -25,21 +25,30 @@ Both methods represent complex multivariate functions as sums of lower-dimension
 
 ### Installation
 
+#### Option 1: Install from PyPI (Recommended)
+
+```bash
+# Install with all backends (NumPy, PyTorch, TensorFlow)
+pip install hdmrlib
+
+# Development installation (includes testing tools)
+pip install hdmrlib[dev]
+```
+
+#### Option 2: Install from Source
+
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/your-username/HDMR-Lib.git
+git clone https://github.com/hdmrlib/HDMR-Lib.git
 cd HDMR-Lib
 ```
 
-2. **Create virtual environment:**
+2. **Install in development mode:**
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+pip install -e .
 
-3. **Install dependencies:**
-```bash
-pip install -r requirements.txt
+# Or with development tools
+pip install -e .[dev]
 ```
 
 ### GPU Acceleration (Optional)
@@ -63,9 +72,7 @@ pip install tensorflow
 
 ```python
 import numpy as np
-from hdmr import HDMR
-from empr import EMPR
-from backends import set_backend
+from hdmrlib import HDMR, EMPR, set_backend
 
 # Create test data
 tensor = np.random.rand(5, 5, 5)
@@ -96,7 +103,7 @@ print(f"Available components: {list(empr_components.keys())}")
 HDMR-Lib supports multiple computational backends:
 
 ```python
-from backends import set_backend, get_backend
+from hdmrlib import set_backend, get_backend
 
 # Available backends
 set_backend('numpy')      # NumPy (default, always available)
@@ -113,7 +120,7 @@ EMPR provides efficient decomposition with configurable support vectors:
 
 ```python
 import numpy as np
-from empr import EMPR
+from hdmrlib import EMPR
 
 # Create test tensor
 x, y, z = np.meshgrid(np.linspace(0, 1, 6), np.linspace(0, 1, 6), np.linspace(0, 1, 6), indexing='ij')
@@ -144,7 +151,7 @@ print("Available components:", list(components.keys()))
 HDMR uses weighted support vectors for enhanced numerical stability:
 
 ```python
-from hdmr import HDMR
+from hdmrlib import HDMR
 
 # Initialize HDMR with different weight types
 hdmr_avg = HDMR(tensor, weight='avg')        # Average weights (default)
@@ -187,7 +194,7 @@ Compare performance across different backends:
 
 ```python
 import time
-from backends import set_backend
+from hdmrlib import set_backend
 
 backends = ['numpy', 'torch', 'tensorflow']
 tensor = np.random.rand(8, 8, 8)
@@ -346,7 +353,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 **2. Backend Not Available**
 ```python
-from backends import set_backend
+from hdmrlib import set_backend
 
 try:
     set_backend('torch')
@@ -426,8 +433,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 ## 📞 **Support**
-- 🐛 Issues: [GitHub Issues](https://github.com/your-username/HDMR-Lib/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/your-username/HDMR-Lib/discussions)
+- 🐛 Issues: [GitHub Issues](https://github.com/hdmrlib/HDMR-Lib/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/hdmrlib/HDMR-Lib/discussions)
 
 ---
 

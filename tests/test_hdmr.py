@@ -2,12 +2,7 @@
 Testing for HDMR decomposition
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from hdmr import HDMR
-from backends import set_backend
+from hdmrlib import HDMR, set_backend
 import numpy as np
 from numpy.testing import assert_, assert_array_almost_equal, assert_raises
 

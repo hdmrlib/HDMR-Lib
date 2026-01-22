@@ -3,15 +3,9 @@ Basic usage example for HDMR-Lib
 Demonstrates simple HDMR and EMPR decomposition
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
 import numpy as np
-from hdmr import HDMR
-from empr import EMPR
-from backends import set_backend
-from metrics import mean_squared_error
+from hdmrlib import HDMR, EMPR, set_backend
+from hdmrlib.metrics import mean_squared_error
 
 # Set backend
 set_backend('numpy')

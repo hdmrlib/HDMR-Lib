@@ -1,22 +1,24 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hdmr-lib"
+name = "hdmrlib"
 version = "0.1.0"
 description = "High Dimensional Model Representation (HDMR) and Enhanced Multivariate Products Representation (EMPR) library"
 readme = "README.md"
 requires-python = ">=3.8"
-license = {text = "MIT"}
+license = "MIT"
 keywords = ["hdmr", "empr", "tensor", "decomposition", "sensitivity-analysis"]
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "Muhammed Enis Sen", email = "m.enis.97@gmail.com"},
+    {name = "Bugra Eyidogan", email = "bugra.eyidogan@gmail.com"},
+    {name = "Pinar Guler", email = "yalcin.pinar2@gmail.com"},
+    {name = "HDMR-Lib Contributors"}
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -25,6 +27,8 @@ classifiers = [
 ]
 dependencies = [
     "numpy>=1.22",
+    "torch>=2.2",
+    "tensorflow>=2.14",
 ]
 
 [project.optional-dependencies]
@@ -38,10 +42,15 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/HDMR-Lib"
-Documentation = "https://github.com/yourusername/HDMR-Lib#readme"
-Repository = "https://github.com/yourusername/HDMR-Lib"
-"Bug Tracker" = "https://github.com/yourusername/HDMR-Lib/issues"
+Homepage = "https://github.com/hdmrlib/HDMR-Lib"
+Documentation = "https://github.com/hdmrlib/HDMR-Lib#readme"
+Repository = "https://github.com/hdmrlib/HDMR-Lib"
+"Bug Tracker" = "https://github.com/hdmrlib/HDMR-Lib/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hdmrlib*"]
+exclude = ["tests*", "examples*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -51,7 +60,7 @@ python_functions = ["test_*"]
 addopts = "-v --tb=short"
 
 [tool.coverage.run]
-source = ["hdmr", "empr", "backends", "metrics"]
+source = ["hdmrlib"]
 omit = ["*/tests/*", "*/examples/*"]
 
 [tool.coverage.report]

@@ -8,8 +8,8 @@ __version__ = "0.1.0"
 __author__ = "HDMR-Lib Contributors"
 __license__ = "MIT"
 
-from hdmr import HDMR
-from empr import EMPR
-from backends import set_backend, get_backend
+from .hdmr import HDMR
+from .empr import EMPR
+from .backends import set_backend, get_backend
 
 __all__ = ['HDMR', 'EMPR', 'set_backend', 'get_backend', '__version__'] 

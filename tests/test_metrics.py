@@ -2,13 +2,8 @@
 Testing for metrics functions
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from metrics import mean_squared_error, sensitivity_analysis
-from empr import EMPR
-from backends import set_backend
+from hdmrlib.metrics import mean_squared_error, sensitivity_analysis
+from hdmrlib import EMPR, set_backend
 import numpy as np
 from numpy.testing import assert_, assert_almost_equal, assert_raises
 

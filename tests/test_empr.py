@@ -2,12 +2,7 @@
 Testing for EMPR decomposition
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from empr import EMPR
-from backends import set_backend
+from hdmrlib import EMPR, set_backend
 import numpy as np
 from numpy.testing import assert_, assert_array_almost_equal, assert_raises
 

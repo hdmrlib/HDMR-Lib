@@ -2,13 +2,7 @@
 Testing for backend functionality
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from hdmr import HDMR
-from empr import EMPR
-from backends import set_backend, get_backend
+from hdmrlib import HDMR, EMPR, set_backend, get_backend
 import numpy as np
 from numpy.testing import assert_, assert_raises
 import pytest

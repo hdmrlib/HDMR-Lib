@@ -3,15 +3,9 @@ Advanced usage example for HDMR-Lib
 Demonstrates different configurations and sensitivity analysis
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
 import numpy as np
-from hdmr import HDMR
-from empr import EMPR
-from backends import set_backend
-from metrics import mean_squared_error, sensitivity_analysis
+from hdmrlib import HDMR, EMPR, set_backend
+from hdmrlib.metrics import mean_squared_error, sensitivity_analysis
 
 # Set backend
 set_backend('numpy')

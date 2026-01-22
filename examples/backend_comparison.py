@@ -3,16 +3,10 @@ Backend comparison example for HDMR-Lib
 Demonstrates usage across different computational backends
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
 import numpy as np
 import time
-from hdmr import HDMR
-from empr import EMPR
-from backends import set_backend
-from metrics import mean_squared_error
+from hdmrlib import HDMR, EMPR, set_backend
+from hdmrlib.metrics import mean_squared_error
 
 print("=" * 60)
 print("HDMR-Lib Backend Comparison")
