@@ -26,7 +26,7 @@ print("HDMR (High Dimensional Model Representation)")
 print("-" * 60)
 
 hdmr_model = HDMR(tensor, weight='avg', supports='ones')
-hdmr_result = model.decompose(order=2)
+hdmr_result = hdmr_model.decompose(order=2)
 
 print(f"Decomposition shape: {hdmr_result.shape}")
 print(f"MSE: {mean_squared_error(tensor, hdmr_result):.6e}")
