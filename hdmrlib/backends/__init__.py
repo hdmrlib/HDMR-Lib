@@ -39,3 +39,6 @@ def get_backend_instance():
 	if _CURRENT_BACKEND is None:
 		raise RuntimeError("No available backend. Please install a supported backend and try again.")
 	return _BACKEND_MAP[_CURRENT_BACKEND] 
+
+def available_backends():
+	return list(_BACKEND_MAP.keys())
