@@ -10,6 +10,6 @@ __license__ = "MIT"
 
 from .hdmr import HDMR
 from .empr import EMPR
-from .backends import set_backend, get_backend
+from .backends import set_backend, get_backend, available_backends
 
 __all__ = ['HDMR', 'EMPR', 'set_backend', 'get_backend', '__version__'] 
