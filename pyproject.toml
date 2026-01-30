@@ -25,11 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-dependencies = [
-    "numpy>=1.22",
-    "torch>=2.2",
-    "tensorflow>=2.14",
-]
+dependencies = ["numpy>=1.22"]
 
 [project.optional-dependencies]
 torch = ["torch>=2.2"]

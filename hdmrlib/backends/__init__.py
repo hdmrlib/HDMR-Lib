@@ -26,8 +26,17 @@ _CURRENT_BACKEND = 'numpy' if 'numpy' in _BACKEND_MAP else (next(iter(_BACKEND_M
 
 def set_backend(name):
 	global _CURRENT_BACKEND
+	name = (name or "").lower()
+	if name == "tf":
+		name = "tensorflow"
+
 	if name not in _BACKEND_MAP:
+		if name == "torch":
+			raise ImportError("Torch backend not available. Install with: pip install 'hdmrlib[torch]'")
+		if name == "tensorflow":
+			raise ImportError("TensorFlow backend not available. Install with: pip install 'hdmrlib[tensorflow]'")
 		raise ValueError(f"Unknown backend: {name}")
+
 	_CURRENT_BACKEND = name
 
 
