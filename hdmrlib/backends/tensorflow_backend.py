@@ -19,13 +19,19 @@ class TensorFlowBackend(BaseBackend):
     class _HDMR:
         def __init__(self, G, weight="avg", custom_weights=None, supports='ones', custom_supports=None):
             self.G = tf.convert_to_tensor(G, dtype=tf.float64)
-            self.dimensions = G.shape
+            # Check for singleton dimensions and squeeze if present
+            if 1 in self.G.shape:
+                self.G = tf.squeeze(self.G)
+                print(f"Warning: Input tensor contained singleton dimensions.")
+                print(f"Original shape: {G.shape}")
+                print(f"Squeezed shape: {self.G.shape}")
+            self.dimensions = self.G.shape
             self.custom_supports = custom_supports
             self.support_vectors = self.initialize_support_vectors(supports)
             self.custom_weights = custom_weights
             self.weights = self.initialize_weights(weight)
             self.g0 = self.calculate_g0()
-            self.g_components = {}
+            self.g_components = {'g_0': self.g0}
             self.calculate_hdmr_component(np.arange(len(self.dimensions)))
 
         def initialize_weights(self, weight):
@@ -77,9 +83,7 @@ class TensorFlowBackend(BaseBackend):
             elif supports == 'ones':
                 for dim_size in self.dimensions:
                     s = tf.ones((dim_size, 1), dtype=tf.float64)
-                    l2_norm = tf.norm(s, ord=2)
-                    modified_s = (s * (dim_size ** 0.5)) / l2_norm
-                    support_vectors.append(modified_s)
+                    support_vectors.append(s)
             elif supports == 'custom':
                 if self.custom_supports is None:
                     raise ValueError("Custom supports must be provided for 'custom' support type.")
@@ -167,11 +171,18 @@ class TensorFlowBackend(BaseBackend):
     class _EMPR:
         def __init__(self, G, supports='das', custom_supports=None):
             self.G = tf.convert_to_tensor(G, dtype=tf.float64)
-            self.dimensions = G.shape
+            # Check for singleton dimensions and squeeze if present
+            if 1 in self.G.shape:
+                self.G = tf.squeeze(self.G)
+                print(f"Warning: Input tensor contained singleton dimensions.")
+                print(f"Original shape: {G.shape}")
+                print(f"Squeezed shape: {self.G.shape}")
+            self.dimensions = self.G.shape
             self.custom_supports = custom_supports
             self.support_vectors = self.initialize_support_vectors(supports)
+            self.weights = [1 / dim for dim in self.dimensions]
             self.g0 = self.calculate_g0()
-            self.g_components = {}
+            self.g_components = {'g_0': self.g0}
             self.calculate_empr_component(np.arange(len(self.dimensions)))
 
         def initialize_support_vectors(self, supports):
@@ -204,8 +215,8 @@ class TensorFlowBackend(BaseBackend):
 
         def calculate_g0(self):
             g0 = self.G
-            for i, s in enumerate(self.support_vectors):
-                g0 = tf.tensordot(g0, s, axes=[[0], [0]])
+            for s, w in zip(self.support_vectors, self.weights):
+                g0 = tf.tensordot(g0, s, axes=[[0], [0]]) * w
             return float(g0)
 
         def convert_g_to_string(self, dims):
@@ -224,16 +235,16 @@ class TensorFlowBackend(BaseBackend):
             involved_dims = sorted(involved_dims)
             # First part
             ind = 0
-            for j, s in enumerate(self.support_vectors):
+            for j, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
                 if j not in involved_dims:
-                    G_component = tf.tensordot(G_component, s, axes=[[ind], [0]])
+                    G_component = tf.tensordot(G_component, s, axes=[[ind], [0]]) * w
                 else:
                     ind += 1
             # Second part
             subtracted = tf.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 subtracted = tf.einsum('...i,jk->...ij', subtracted, 
-                                     self.support_vectors[involved_dims[i]])
+                                     self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
             # Third part
             if len(involved_dims) > 1:
                 for i in range(1, len(involved_dims)):
@@ -242,7 +253,7 @@ class TensorFlowBackend(BaseBackend):
                         term = tf.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                         for k in range(len(s)):
                             term = tf.einsum('...i,jk->...ij', term, 
-                                           self.support_vectors[s[k]])
+                                           self.support_vectors[s[k]] * self.weights[s[k]])
                         subtracted += tf.transpose(term, perm=tuple(np.argsort(list(g_combination) + s)))
             G_component = tf.squeeze(G_component)
             subtracted = tf.squeeze(subtracted)
@@ -252,10 +263,10 @@ class TensorFlowBackend(BaseBackend):
         def calculate_approximation(self, order):
             involved_dims = np.arange(len(self.dimensions))
             # First part
-            overall_sum = tf.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
+            overall_sum = tf.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 overall_sum = tf.einsum('...i,jk->...ij', overall_sum, 
-                                      self.support_vectors[involved_dims[i]])
+                                      self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
             # Second-N'th part
             for i in range(1, order+1):
                 for g_combination in combinations(involved_dims, i):
@@ -263,7 +274,7 @@ class TensorFlowBackend(BaseBackend):
                     term = tf.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                     for k in range(len(s)):
                         term = tf.einsum('...i,jk->...ij', term, 
-                                       self.support_vectors[s[k]])
+                                       self.support_vectors[s[k]] * self.weights[s[k]])
                     overall_sum += tf.transpose(term, perm=tuple(np.argsort(list(g_combination) + s)))
             return tf.squeeze(overall_sum)
 
@@ -274,36 +285,10 @@ class TensorFlowBackend(BaseBackend):
             mse = squared_error / tf.cast(num_elements, tf.float64)
             return float(mse)
 
-    def hdmr_decompose(self, tensor, order=2, **kwargs):
-        model = self._HDMR(tensor, **kwargs)
-        return model.calculate_approximation(order)
+    def get_hdmr_model(self, tensor, **kwargs):
+        """Return an HDMR model instance for reconstruction."""
+        return self._HDMR(tensor, **kwargs)
 
-    def empr_decompose(self, tensor, order=2, **kwargs):
-        model = self._EMPR(tensor, **kwargs)
-        return model.calculate_approximation(order)
-
-    def hdmr_components(self, tensor, max_order=None, **kwargs):
-        model = self._HDMR(tensor, **kwargs)
-        num_dims = len(model.dimensions)
-        if max_order is None:
-            max_order = num_dims
-        components = {}
-        dims = list(range(num_dims))
-        for r in range(1, min(max_order, num_dims) + 1):
-            for comb in combinations(dims, r):
-                key = model.convert_g_to_string(comb)
-                components[key] = model.g_components[key]
-        return components
-
-    def empr_components(self, tensor, max_order=None, **kwargs):
-        model = self._EMPR(tensor, **kwargs)
-        num_dims = len(model.dimensions)
-        if max_order is None:
-            max_order = num_dims
-        components = {}
-        dims = list(range(num_dims))
-        for r in range(1, min(max_order, num_dims) + 1):
-            for comb in combinations(dims, r):
-                key = model.convert_g_to_string(comb)
-                components[key] = model.g_components[key]
-        return components 
+    def get_empr_model(self, tensor, **kwargs):
+        """Return an EMPR model instance for reconstruction."""
+        return self._EMPR(tensor, **kwargs) 

@@ -1,14 +1,25 @@
 from .backends import get_backend_instance
 
 class EMPR:
-    def __init__(self, tensor, **kwargs):
+    def __init__(self, tensor, order=2, **kwargs):
         self.tensor = tensor
         self.kwargs = kwargs
-
-    def decompose(self, order=2):
+        self.order = order
+        # Get backend and create model instance for reconstruction
         backend = get_backend_instance()
-        return backend.empr_decompose(self.tensor, order=order, **self.kwargs)
+        self._model = backend.get_empr_model(self.tensor, **self.kwargs)
+        
+        self.dimensions = self._model.dimensions
+        self.weights = self._model.weights
+        self.support_vectors = self._model.support_vectors
+    
+    def reconstruct(self, order=None):
+        """Reconstruct/approximate the tensor using calculate_approximation with specified order"""
+        if order is None:
+            order = self.order
+        return self._model.calculate_approximation(order)
 
-    def components(self, max_order=None):
-        backend = get_backend_instance()
-        return backend.empr_components(self.tensor, max_order=max_order, **self.kwargs)
+    def components(self, elements=None):
+        if elements is None:
+            return dict(self._model.g_components)
+        return {key: self._model.g_components[key] for key in elements}

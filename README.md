@@ -81,17 +81,17 @@ tensor = np.random.rand(5, 5, 5)
 set_backend('numpy')
 
 # EMPR Decomposition
-empr_model = EMPR(tensor)
-empr_result = empr_model.decompose(order=2)
-empr_components = empr_model.components(max_order=2)
+empr_model = EMPR(tensor, order=2)
+empr_result = empr_model.reconstruct()
+empr_components = empr_model.components  # dict of components
 
 # HDMR Decomposition  
-hdmr_model = HDMR(tensor)
-hdmr_result = hdmr_model.decompose(order=2)
-hdmr_components = hdmr_model.components(max_order=2)
+hdmr_model = HDMR(tensor, order=2)
+hdmr_result = hdmr_model.reconstruct()
+hdmr_components = hdmr_model.components
 
 print(f"EMPR MSE: {np.mean((tensor - empr_result) ** 2):.6e}")
-print(f"Available components: {list(empr_components.keys())}")
+print(f\"Available EMPR components: {list(empr_components.keys())}\")
 ```
 
 ---
@@ -131,14 +131,14 @@ empr_das = EMPR(tensor, supports='das')     # Data-Adaptive Supports (recommende
 empr_ones = EMPR(tensor, supports='ones')   # Uniform supports
 
 # Decompose at different orders
-result_order1 = empr_das.decompose(order=1)  # Main effects only
-result_order2 = empr_das.decompose(order=2)  # Main effects + 2-way interactions
-result_order3 = empr_das.decompose(order=3)  # Full decomposition
+result_order1 = empr_das.reconstruct(order=1)  # Main effects only
+result_order2 = empr_das.reconstruct(order=2)  # Main effects + 2-way interactions
+result_order3 = empr_das.reconstruct(order=3)  # Full decomposition
 
-# Extract components
-components = empr_das.components(max_order=3)
+# Extract components (all stored in the underlying model)
+components = empr_das.components
 print("Available components:", list(components.keys()))
-# Output: ['g1', 'g2', 'g3', 'g12', 'g13', 'g23', 'g123']
+# Example: ['g_1', 'g_2', 'g_3', 'g_1,2', 'g_1,3', 'g_2,3', 'g_1,2,3']
 
 # Component interpretation:
 # g1, g2, g3: Main effects (univariate)
@@ -154,17 +154,17 @@ HDMR uses weighted support vectors for enhanced numerical stability:
 from hdmrlib import HDMR
 
 # Initialize HDMR with different weight types
-hdmr_avg = HDMR(tensor, weight='avg')        # Average weights (default)
-hdmr_gauss = HDMR(tensor, weight='gaussian') # Gaussian weights
-hdmr_cheb = HDMR(tensor, weight='chebyshev') # Chebyshev weights
+hdmr_avg = HDMR(tensor, order=2, weight='avg')        # Average weights (default)
+hdmr_gauss = HDMR(tensor, order=2, weight='gaussian') # Gaussian weights
+hdmr_cheb = HDMR(tensor, order=2, weight='chebyshev') # Chebyshev weights
 
 # Custom weights
 custom_weights = [np.ones((6, 1)), np.ones((6, 1)), np.ones((6, 1))]
 hdmr_custom = HDMR(tensor, weight='custom', custom_weights=custom_weights)
 
 # Decompose and analyze
-result = hdmr_avg.decompose(order=2)
-components = hdmr_avg.components(max_order=2)
+result = hdmr_avg.reconstruct(order=2)
+components = hdmr_avg.components
 
 # Calculate reconstruction quality
 mse = np.mean((tensor - result) ** 2)
@@ -184,8 +184,8 @@ custom_supports = [
 ]
 
 # Use custom supports
-empr_custom = EMPR(tensor, supports='custom', custom_supports=custom_supports)
-result = empr_custom.decompose(order=2)
+empr_custom = EMPR(tensor, supports='custom', order=2, custom_supports=custom_supports)
+result = empr_custom.reconstruct(order=2)
 ```
 
 ### 5. **Multi-Backend Comparison**
@@ -204,8 +204,8 @@ for backend in backends:
         set_backend(backend)
         
         start_time = time.time()
-        model = EMPR(tensor)
-        result = model.decompose(order=2)
+        model = EMPR(tensor, order=2)
+        result = model.reconstruct(order=2)
         elapsed = time.time() - start_time
         
         mse = np.mean((tensor - result) ** 2)
@@ -229,8 +229,8 @@ x1, x2, x3 = np.meshgrid(np.linspace(-1, 1, 8), np.linspace(-1, 1, 8), np.linspa
 tensor = 5*x1**2 + 2*x2 + 0.1*x3 + x1*x2  # x1 most important, x3 least
 
 # Decompose with EMPR
-model = EMPR(tensor, supports='das')
-components = model.components(max_order=2)
+model = EMPR(tensor, supports='das', order=2)
+components = model.components
 
 # Calculate component variances (sensitivity indicators)
 sensitivities = {}
@@ -258,11 +258,11 @@ x, y, z = np.meshgrid(np.linspace(0, 1, 10), np.linspace(0, 1, 10), np.linspace(
 training_data = expensive_function(x, y, z)
 
 # Train EMPR surrogate
-surrogate = EMPR(training_data, supports='das')
+surrogate = EMPR(training_data, supports='das', order=3)
 
 # Test approximation quality at different orders
 for order in [1, 2, 3]:
-    approx = surrogate.decompose(order=order)
+    approx = surrogate.reconstruct(order=order)
     
     # Compare on training grid
     error = np.mean((training_data - approx) ** 2)
@@ -280,19 +280,19 @@ tensor_large = np.random.rand(20, 20, 20)
 # Try PyTorch backend for potential GPU acceleration
 try:
     set_backend('torch')
-    model_torch = EMPR(tensor_large)
-    result_torch = model_torch.decompose(order=2)
+    model_torch = EMPR(tensor_large, order=2)
+    result_torch = model_torch.reconstruct(order=2)
     print("PyTorch backend successful")
 except:
     print("PyTorch not available, using NumPy")
     set_backend('numpy')
-    model_cpu = EMPR(tensor_large)
-    result_cpu = model_cpu.decompose(order=2)
+    model_cpu = EMPR(tensor_large, order=2)
+    result_cpu = model_cpu.reconstruct(order=2)
 
 # For very large tensors, consider lower order approximations
-model = EMPR(tensor_large)
-result_fast = model.decompose(order=1)  # Faster, main effects only
-result_accurate = model.decompose(order=3)  # Slower, full interactions
+model = EMPR(tensor_large, order=3)
+result_fast = model.reconstruct(order=1)  # Faster, main effects only
+result_accurate = model.reconstruct(order=3)  # Slower, full interactions
 ```
 
 ---
@@ -368,18 +368,18 @@ except ValueError as e:
 tensor_large = np.random.rand(50, 50, 50)
 
 # Instead of order=3, use order=2 or order=1
-model = EMPR(tensor_large)
-result = model.decompose(order=1)  # Uses less memory
+model = EMPR(tensor_large, order=1)
+result = model.reconstruct(order=1)  # Uses less memory
 ```
 
 **4. Poor Approximation Quality**
 ```python
 # Try different support vectors or increase order
-model_das = EMPR(tensor, supports='das')
-model_ones = EMPR(tensor, supports='ones')
+model_das = EMPR(tensor, supports='das', order=2)
+model_ones = EMPR(tensor, supports='ones', order=2)
 
-result_das = model_das.decompose(order=2)
-result_ones = model_ones.decompose(order=2)
+result_das = model_das.reconstruct(order=2)
+result_ones = model_ones.reconstruct(order=2)
 
 mse_das = np.mean((tensor - result_das) ** 2)
 mse_ones = np.mean((tensor - result_ones) ** 2)

@@ -12,15 +12,20 @@ class TorchBackend(BaseBackend):
     class _HDMR:
         def __init__(self, G, weight="avg", custom_weights=None, supports='ones', custom_supports=None, device='cpu'):
             self.device = device
-            G = torch.tensor(G, dtype=torch.float64).to(device)
-            self.G = G
-            self.dimensions = G.shape
+            self.G = torch.tensor(G, dtype=torch.float64).to(device)
+            # Check for singleton dimensions and squeeze if present
+            if 1 in self.G.shape:
+                self.G = torch.squeeze(self.G)
+                print(f"Warning: Input tensor contained singleton dimensions.")
+                print(f"Original shape: {G.shape}")
+                print(f"Squeezed shape: {self.G.shape}")
+            self.dimensions = self.G.shape
             self.custom_supports = custom_supports
             self.support_vectors = self.initialize_support_vectors(supports)
             self.custom_weights = custom_weights
             self.weights = self.initialize_weights(weight)
             self.g0 = self.calculate_g0()
-            self.g_components = {}
+            self.g_components = {'g_0': self.g0}
             self.calculate_hdmr_component(np.arange(len(self.dimensions)))
 
         def initialize_weights(self, weight):
@@ -74,9 +79,7 @@ class TorchBackend(BaseBackend):
             elif supports == 'ones':
                 for dim_size in self.dimensions:
                     s = torch.ones(dim_size, 1, dtype=torch.float64, device=self.device)
-                    l2_norm = torch.norm(s, p=2)
-                    modified_s = (s * (dim_size ** 0.5)) / l2_norm
-                    support_vectors.append(modified_s)
+                    support_vectors.append(s)
             elif supports == 'custom':
                 if self.custom_supports is None:
                     raise ValueError("Custom supports must be provided for 'custom' support type.")
@@ -167,11 +170,18 @@ class TorchBackend(BaseBackend):
         def __init__(self, G, supports='das', custom_supports=None, device='cpu'):
             self.device = device
             self.G = torch.tensor(G, dtype=torch.float64, device=device)
-            self.dimensions = G.shape
+            # Check for singleton dimensions and squeeze if present
+            if 1 in self.G.shape:
+                self.G = torch.squeeze(self.G)
+                print(f"Warning: Input tensor contained singleton dimensions.")
+                print(f"Original shape: {G.shape}")
+                print(f"Squeezed shape: {self.G.shape}")
+            self.dimensions = self.G.shape
             self.custom_supports = custom_supports
             self.support_vectors = self.initialize_support_vectors(supports)
+            self.weights = [1/dim for dim in self.dimensions]  # Calculate EMPR weights
             self.g0 = self.calculate_g0()
-            self.g_components = {}
+            self.g_components = {'g_0': self.g0}
             self.calculate_empr_component(np.arange(len(self.dimensions)))
 
         def initialize_support_vectors(self, supports):
@@ -206,9 +216,9 @@ class TorchBackend(BaseBackend):
 
         def calculate_g0(self):
             g0 = self.G
-            for i, s in enumerate(self.support_vectors):
-                g0 = torch.tensordot(g0, s, dims=([0], [0]))
-            return float(g0)
+            for i, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
+                g0 = torch.tensordot(g0, s, dims=([0], [0])) * w
+            return g0.item()
 
         def convert_g_to_string(self, dims):
             return 'g_' + ','.join(map(str, list(map(lambda x: x+1, dims))))
@@ -226,16 +236,16 @@ class TorchBackend(BaseBackend):
             involved_dims = sorted(involved_dims)
             # First part
             ind = 0
-            for j, s in enumerate(self.support_vectors):
+            for j, (s, w) in enumerate(zip(self.support_vectors, self.weights)):
                 if j not in involved_dims:
-                    G_component = torch.tensordot(G_component, s, dims=([ind], [0]))
+                    G_component = torch.tensordot(G_component, s, dims=([ind], [0])) * w
                 else:
                     ind += 1
             # Second part
-            subtracted = torch.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
+            subtracted = torch.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 subtracted = torch.einsum('...i,jk->...ij', subtracted, 
-                                        self.support_vectors[involved_dims[i]])
+                                        self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
             # Third part
             if len(involved_dims) > 1:
                 for i in range(1, len(involved_dims)):
@@ -244,7 +254,7 @@ class TorchBackend(BaseBackend):
                         term = torch.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                         for k in range(len(s)):
                             term = torch.einsum('...i,jk->...ij', term, 
-                                              self.support_vectors[s[k]])
+                                              self.support_vectors[s[k]] * self.weights[s[k]])
                         subtracted += term.permute(tuple(np.argsort(list(g_combination) + s)))
             G_component = torch.squeeze(G_component)
             subtracted = torch.squeeze(subtracted)
@@ -254,10 +264,10 @@ class TorchBackend(BaseBackend):
         def calculate_approximation(self, order):
             involved_dims = np.arange(len(self.dimensions))
             # First part
-            overall_sum = torch.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
+            overall_sum = torch.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 overall_sum = torch.einsum('...i,jk->...ij', overall_sum, 
-                                      self.support_vectors[involved_dims[i]])
+                                      self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
             # Second-N'th part
             for i in range(1, order+1):
                 for g_combination in combinations(involved_dims, i):
@@ -265,7 +275,7 @@ class TorchBackend(BaseBackend):
                     term = torch.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                     for k in range(len(s)):
                         term = torch.einsum('...i,jk->...ij', term, 
-                                          self.support_vectors[s[k]])
+                                          self.support_vectors[s[k]] * self.weights[s[k]])
                     overall_sum += term.permute(tuple(np.argsort(list(g_combination) + s)))
             return torch.squeeze(overall_sum)
 
@@ -276,36 +286,10 @@ class TorchBackend(BaseBackend):
             mse = squared_error / num_elements
             return float(mse)
 
-    def hdmr_decompose(self, tensor, order=2, **kwargs):
-        model = self._HDMR(tensor, device=self.device, **kwargs)
-        return model.calculate_approximation(order)
+    def get_hdmr_model(self, tensor, **kwargs):
+        """Return an HDMR model instance for reconstruction."""
+        return self._HDMR(tensor, device=self.device, **kwargs)
 
-    def empr_decompose(self, tensor, order=2, **kwargs):
-        model = self._EMPR(tensor, device=self.device, **kwargs)
-        return model.calculate_approximation(order)
-
-    def hdmr_components(self, tensor, max_order=None, **kwargs):
-        model = self._HDMR(tensor, device=self.device, **kwargs)
-        num_dims = len(model.dimensions)
-        if max_order is None:
-            max_order = num_dims
-        components = {}
-        dims = list(range(num_dims))
-        for r in range(1, min(max_order, num_dims) + 1):
-            for comb in combinations(dims, r):
-                key = model.convert_g_to_string(comb)
-                components[key] = model.g_components[key]
-        return components
-
-    def empr_components(self, tensor, max_order=None, **kwargs):
-        model = self._EMPR(tensor, device=self.device, **kwargs)
-        num_dims = len(model.dimensions)
-        if max_order is None:
-            max_order = num_dims
-        components = {}
-        dims = list(range(num_dims))
-        for r in range(1, min(max_order, num_dims) + 1):
-            for comb in combinations(dims, r):
-                key = model.convert_g_to_string(comb)
-                components[key] = model.g_components[key]
-        return components 
+    def get_empr_model(self, tensor, **kwargs):
+        """Return an EMPR model instance for reconstruction."""
+        return self._EMPR(tensor, device=self.device, **kwargs) 
