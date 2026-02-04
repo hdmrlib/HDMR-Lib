@@ -229,7 +229,7 @@ class NumPyBackend(BaseBackend):
                 else:
                     ind += 1
             # Second part
-            subtracted = np.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
+            subtracted = np.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 subtracted = np.einsum('...i,jk->...ij', subtracted, 
                                      self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])

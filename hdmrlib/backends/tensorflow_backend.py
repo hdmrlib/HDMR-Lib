@@ -241,7 +241,7 @@ class TensorFlowBackend(BaseBackend):
                 else:
                     ind += 1
             # Second part
-            subtracted = tf.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
+            subtracted = tf.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 subtracted = tf.einsum('...i,jk->...ij', subtracted, 
                                      self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
