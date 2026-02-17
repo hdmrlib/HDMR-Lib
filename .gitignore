@@ -77,3 +77,7 @@ results/
 hw_metrics.zip
 convergence_plot.png
 
+
+# Sphinx docs build outputs
+docs/_build/
+docs/generated/
