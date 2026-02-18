@@ -1,0 +1,22 @@
+/* Slightly more "product" look (TensorLy-ish) */
+
+/* Navbar brand/logo sizing */
+.bd-header .navbar-brand img {
+  height: 28px;
+}
+
+/* Typography tightening */
+h1, h2, h3 {
+  letter-spacing: -0.01em;
+}
+
+/* Cards (sphinx-design) */
+.sd-card {
+  border-radius: 14px;
+}
+
+/* Code blocks: a bit nicer spacing */
+div.highlight pre {
+  padding: 0.9rem;
+  border-radius: 10px;
+}
