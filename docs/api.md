@@ -3,7 +3,12 @@
 ```{eval-rst}
 .. autosummary::
    :toctree: generated
-   :recursive:
 
-   hdmrlib
+   hdmrlib.hdmr
+   hdmrlib.empr
+   hdmrlib.metrics
+   hdmrlib.backends.base
+   hdmrlib.backends.numpy_backend
+   hdmrlib.backends.torch_backend
+```
 
