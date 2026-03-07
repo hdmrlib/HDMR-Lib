@@ -1,6 +1,6 @@
 # Quick Start
 
-This page provides a short introduction to the main workflow of **HDMR-Lib**.
+A short introduction to HDMR-Lib showing the minimal workflow for getting started.
 
 For installation instructions, see the Installation page.
 
@@ -8,15 +8,6 @@ For installation instructions, see the Installation page.
 :local:
 :depth: 2
 ```
-
-## Overview
-
-HDMR-Lib provides tools for high-dimensional model representation and related approximation methods for multivariate functions represented on tensor grids.
-
-The library currently supports multiple computational backends and includes two main decomposition approaches:
-
-- EMPR
-- HDMR
 
 ## Basic usage pattern
 
