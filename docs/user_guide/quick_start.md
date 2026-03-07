@@ -2,13 +2,6 @@
 
 A short introduction to HDMR-Lib showing the minimal workflow for getting started.
 
-For installation instructions, see the Installation page.
-
-```{contents}
-:local:
-:depth: 2
-```
-
 ## Basic usage pattern
 
 A typical workflow in HDMR-Lib consists of the following steps:
@@ -98,13 +91,3 @@ print(model.dimensions)
 print(model.weights)
 print(model.support_vectors)
 ```
-
-## Next steps
-
-The following sections explain the main parts of the library in more detail:
-
-- Overview of HDMR-Lib
-- Computational Backends
-- Working with Tensor Data
-- EMPR Decomposition
-- HDMR Decomposition
