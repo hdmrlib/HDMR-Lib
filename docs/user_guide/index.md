@@ -4,14 +4,11 @@
 :maxdepth: 1
 
 quick_start
-overview_of_hdmr_lib
+library_overview
 computational_backends
 working_with_tensor_data
-empr_decomposition
-hdmr_decomposition
-selecting_the_approximation_order
-understanding_decomposition_components
-evaluating_approximation_quality
-performance_considerations
+decomposition_methods
+interpreting_results
+performance
 common_issues
 ```
