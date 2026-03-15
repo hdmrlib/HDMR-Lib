@@ -1,4 +1,4 @@
-# Backends
+# Examples
 
 HDMR-Lib can run on multiple backends. Some are optional dependencies.
 
