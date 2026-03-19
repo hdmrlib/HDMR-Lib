@@ -4,7 +4,7 @@
 **Enhanced Multivariate Products Representation (EMPR)** for tensor and function decomposition,
 with support for multiple computational backends.
 
-```{grid} 1 1 2 3
+````{grid} 1 1 2 3
 :gutter: 2
 
 ```{grid-item-card} Installation
@@ -37,7 +37,7 @@ Go to API Reference
 ```
 ```
 
-```
+````
 
 ## Overview
 
