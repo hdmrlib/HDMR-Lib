@@ -30,3 +30,15 @@ HDMR-Lib currently supports:
 - **NumPy** for standard array-based workflows
 - **PyTorch** for tensor computation and GPU-enabled pipelines
 - **TensorFlow** for TensorFlow-based numerical workflows
+
+```{toctree}
+:maxdepth: 2
+:hidden:
+
+install
+user_guide/index
+fundamentals
+examples
+api
+```
+
