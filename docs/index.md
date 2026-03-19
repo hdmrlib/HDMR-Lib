@@ -1,13 +1,14 @@
 # HDMR-Lib
 
-High-Dimensional Model Representation (HDMR) and Enhanced Multivariate Products Representation (EMPR)
-for tensor/function decomposition with multi-backend support.
+**HDMR-Lib** is a Python library for **High-Dimensional Model Representation (HDMR)** and
+**Enhanced Multivariate Products Representation (EMPR)** for tensor and function decomposition,
+with support for multiple computational backends.
 
-```{grid} 1 2 2 3
+```{grid} 1 1 2 3
 :gutter: 2
 
 ```{grid-item-card} Installation
-Get started quickly, including optional backends.
+Install HDMR-Lib and optional backends.
 +++
 ```{button-ref} install
 :color: primary
@@ -16,36 +17,41 @@ Go to Installation
 ```
 ```
 
-```{grid-item-card} Quickstart
-A minimal end-to-end example.
+```{grid-item-card} Quick Start
+Run a minimal decomposition example with HDMR-Lib.
 +++
-```{button-ref} quickstart
+```{button-ref} user_guide/quick_start
 :color: primary
 :expand:
-Go to Quickstart
+Go to Quick Start
 ```
 ```
 
 ```{grid-item-card} API Reference
-Autosummary-generated API docs.
+Browse the full API documentation.
 +++
 ```{button-ref} api
 :color: primary
 :expand:
-Go to API
+Go to API Reference
 ```
 ```
 
 ```
+
+## Overview
+
+HDMR-Lib provides tools for decomposing high-dimensional tensors and sampled functions into
+lower-order component representations. The library supports both **HDMR** and **EMPR**
+formulations and is designed to work with **NumPy**, **PyTorch**, and **TensorFlow** backends.
 
 ```{toctree}
 :maxdepth: 2
 :hidden:
 
 install
-user_guide/index.md
+user_guide/index
 fundamentals
 examples
 api
 ```
-
