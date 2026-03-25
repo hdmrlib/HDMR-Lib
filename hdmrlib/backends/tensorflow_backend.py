@@ -123,10 +123,10 @@ class TensorFlowBackend(BaseBackend):
                 else:
                     ind += 1
             # Second part
-            subtracted = tf.squeeze((self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]]) * self.g0)
+            subtracted = tf.squeeze((self.support_vectors[involved_dims[0]] * self.g0))
             for i in range(1, len(involved_dims)):
                 subtracted = tf.einsum('...i,jk->...ij', subtracted, 
-                                     (self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]]))
+                                     (self.support_vectors[involved_dims[i]]))
             # Third part
             if len(involved_dims) > 1:
                 for i in range(1, len(involved_dims)):
@@ -135,7 +135,7 @@ class TensorFlowBackend(BaseBackend):
                         term = tf.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                         for k in range(len(s)):
                             term = tf.einsum('...i,jk->...ij', term, 
-                                           (self.support_vectors[s[k]] * self.weights[s[k]]))
+                                           (self.support_vectors[s[k]]))
                         subtracted += tf.transpose(term, perm=np.argsort(list(g_combination) + s))
             G_component = tf.squeeze(G_component)
             subtracted = tf.squeeze(subtracted)
@@ -145,10 +145,10 @@ class TensorFlowBackend(BaseBackend):
         def calculate_approximation(self, order):
             involved_dims = np.arange(len(self.dimensions))
             # First part
-            overall_sum = tf.squeeze((self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]]) * self.g0)
+            overall_sum = tf.squeeze((self.support_vectors[involved_dims[0]] * self.g0))
             for i in range(1, len(involved_dims)):
                 overall_sum = tf.einsum('...i,jk->...ij', overall_sum, 
-                                      (self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]]))
+                                      (self.support_vectors[involved_dims[i]]))
             # Second-N'th part
             for i in range(1, order+1):
                 for g_combination in combinations(involved_dims, i):
@@ -156,7 +156,7 @@ class TensorFlowBackend(BaseBackend):
                     term = tf.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                     for k in range(len(s)):
                         term = tf.einsum('...i,jk->...ij', term, 
-                                       (self.support_vectors[s[k]] * self.weights[s[k]]))
+                                       (self.support_vectors[s[k]]))
                     overall_sum += tf.transpose(term, perm=np.argsort(list(g_combination) + s))
             return tf.squeeze(overall_sum)
 
@@ -241,10 +241,10 @@ class TensorFlowBackend(BaseBackend):
                 else:
                     ind += 1
             # Second part
-            subtracted = tf.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
+            subtracted = tf.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 subtracted = tf.einsum('...i,jk->...ij', subtracted, 
-                                     self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
+                                     self.support_vectors[involved_dims[i]])
             # Third part
             if len(involved_dims) > 1:
                 for i in range(1, len(involved_dims)):
@@ -253,7 +253,7 @@ class TensorFlowBackend(BaseBackend):
                         term = tf.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                         for k in range(len(s)):
                             term = tf.einsum('...i,jk->...ij', term, 
-                                           self.support_vectors[s[k]] * self.weights[s[k]])
+                                           self.support_vectors[s[k]])
                         subtracted += tf.transpose(term, perm=tuple(np.argsort(list(g_combination) + s)))
             G_component = tf.squeeze(G_component)
             subtracted = tf.squeeze(subtracted)
@@ -263,10 +263,10 @@ class TensorFlowBackend(BaseBackend):
         def calculate_approximation(self, order):
             involved_dims = np.arange(len(self.dimensions))
             # First part
-            overall_sum = tf.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
+            overall_sum = tf.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 overall_sum = tf.einsum('...i,jk->...ij', overall_sum, 
-                                      self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
+                                      self.support_vectors[involved_dims[i]])
             # Second-N'th part
             for i in range(1, order+1):
                 for g_combination in combinations(involved_dims, i):
@@ -274,7 +274,7 @@ class TensorFlowBackend(BaseBackend):
                     term = tf.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                     for k in range(len(s)):
                         term = tf.einsum('...i,jk->...ij', term, 
-                                       self.support_vectors[s[k]] * self.weights[s[k]])
+                                       self.support_vectors[s[k]])
                     overall_sum += tf.transpose(term, perm=tuple(np.argsort(list(g_combination) + s)))
             return tf.squeeze(overall_sum)
 
