@@ -13,8 +13,8 @@ class TensorFlowBackend(BaseBackend):
                 # Enable memory growth to avoid allocating all GPU memory
                 for gpu in self.gpus:
                     tf.config.experimental.set_memory_growth(gpu, True)
-            except RuntimeError as e:
-                print(f"GPU configuration error: {e}")
+            except RuntimeError as e:  # pragma: no cover
+                print(f"GPU configuration error: {e}")  # pragma: no cover
     # HDMR implementation
     class _HDMR:
         def __init__(self, G, weight="avg", custom_weights=None, supports='ones', custom_supports=None):
@@ -162,7 +162,8 @@ class TensorFlowBackend(BaseBackend):
 
         def calculate_mse(self, order):
             T_empr = self.calculate_approximation(order)
-            squared_error = tf.norm(self.G - T_empr, ord='fro')
+            diff = self.G - T_empr
+            squared_error = tf.sqrt(tf.reduce_sum(tf.square(diff)))
             num_elements = tf.size(self.G)
             mse = squared_error / tf.cast(num_elements, tf.float64)
             return float(mse)

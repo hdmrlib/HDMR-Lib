@@ -1,16 +1,16 @@
 try:
 	from .numpy_backend import NumPyBackend
-except Exception:
+except Exception:  # pragma: no cover
 	NumPyBackend = None
 
 try:
 	from .torch_backend import TorchBackend
-except Exception:
+except Exception:  # pragma: no cover
 	TorchBackend = None
 
 try:
 	from .tensorflow_backend import TensorFlowBackend
-except Exception:
+except Exception:  # pragma: no cover
 	TensorFlowBackend = None
 
 _BACKEND_MAP = {}
@@ -32,9 +32,9 @@ def set_backend(name):
 
 	if name not in _BACKEND_MAP:
 		if name == "torch":
-			raise ImportError("Torch backend not available. Install with: pip install 'hdmrlib[torch]'")
+			raise ImportError("Torch backend not available. Install with: pip install 'hdmrlib[torch]'")  # pragma: no cover
 		if name == "tensorflow":
-			raise ImportError("TensorFlow backend not available. Install with: pip install 'hdmrlib[tensorflow]'")
+			raise ImportError("TensorFlow backend not available. Install with: pip install 'hdmrlib[tensorflow]'")  # pragma: no cover
 		raise ValueError(f"Unknown backend: {name}")
 
 	_CURRENT_BACKEND = name
@@ -46,7 +46,7 @@ def get_backend():
 
 def get_backend_instance():
 	if _CURRENT_BACKEND is None:
-		raise RuntimeError("No available backend. Please install a supported backend and try again.")
+		raise RuntimeError("No available backend. Please install a supported backend and try again.")  # pragma: no cover
 	return _BACKEND_MAP[_CURRENT_BACKEND] 
 
 def available_backends():

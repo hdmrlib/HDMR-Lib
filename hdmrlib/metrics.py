@@ -18,8 +18,8 @@ def mean_squared_error(true, pred):
             true = true.detach().cpu().numpy()
         if torch.is_tensor(pred):
             pred = pred.detach().cpu().numpy()
-    except (ImportError, AttributeError):
-        pass
+    except (ImportError, AttributeError):  # pragma: no cover
+        pass  # pragma: no cover
     
     try:
         import tensorflow as tf
@@ -27,8 +27,8 @@ def mean_squared_error(true, pred):
             true = true.numpy()
         if isinstance(pred, tf.Tensor):
             pred = pred.numpy()
-    except (ImportError, AttributeError):
-        pass
+    except (ImportError, AttributeError):  # pragma: no cover
+        pass  # pragma: no cover
     
     # Ensure numpy arrays
     true = np.asarray(true)
@@ -59,15 +59,15 @@ def sensitivity_analysis(tensor, components, component_list, g0=None, return_dic
             import torch
             if torch.is_tensor(component_tensor):
                 return component_tensor.detach().cpu().numpy()
-        except (ImportError, AttributeError):
-            pass
+        except (ImportError, AttributeError):  # pragma: no cover
+            pass  # pragma: no cover
         
         try:
             import tensorflow as tf
             if isinstance(component_tensor, tf.Tensor):
                 return component_tensor.numpy()
-        except (ImportError, AttributeError):
-            pass
+        except (ImportError, AttributeError):  # pragma: no cover
+            pass  # pragma: no cover
         
         return np.asarray(component_tensor)
     

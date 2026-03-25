@@ -24,34 +24,34 @@ print("-" * 60)
 
 try:
     import torch
-    
+
     if torch.cuda.is_available():
         print(f"\nCUDA Available: Yes")
         print(f"CUDA Device: {torch.cuda.get_device_name(0)}")
         print(f"CUDA Version: {torch.version.cuda}")
     else:
         print(f"\nCUDA Available: No (using CPU only)")
-    
+
     set_backend('torch')
-    
+
     for size in tensor_sizes:
         tensor = np.random.rand(*size)
         print(f"\n  Tensor size: {size}")
-        
-        # Run EMPR decomposition
+
+        # Run EMPR reconstruction
         start_time = time.time()
         model = EMPR(tensor, supports='das')
-        result = model.decompose(order=2)
+        result = model.reconstruct(order=2)
         elapsed_time = time.time() - start_time
-        
+
         # Convert to numpy for MSE
         if torch.is_tensor(result):
             result_np = result.detach().cpu().numpy()
         else:
             result_np = np.asarray(result)
-        
+
         mse = mean_squared_error(tensor, result_np)
-        
+
         device_used = "CUDA" if torch.cuda.is_available() else "CPU"
         print(f"    Device: {device_used}")
         print(f"    Time: {elapsed_time:.4f}s")
@@ -71,7 +71,7 @@ print("-" * 60)
 
 try:
     import tensorflow as tf
-    
+
     gpus = tf.config.list_physical_devices('GPU')
     if gpus:
         print(f"\nGPUs Available: {len(gpus)}")
@@ -79,27 +79,27 @@ try:
             print(f"  GPU {i}: {gpu.name}")
     else:
         print(f"\nGPUs Available: No (using CPU only)")
-    
+
     set_backend('tensorflow')
-    
+
     for size in tensor_sizes:
         tensor = np.random.rand(*size)
         print(f"\n  Tensor size: {size}")
-        
-        # Run EMPR decomposition
+
+        # Run EMPR reconstruction
         start_time = time.time()
         model = EMPR(tensor, supports='das')
-        result = model.decompose(order=2)
+        result = model.reconstruct(order=2)
         elapsed_time = time.time() - start_time
-        
+
         # Convert to numpy for MSE
         if isinstance(result, tf.Tensor):
             result_np = result.numpy()
         else:
             result_np = np.asarray(result)
-        
+
         mse = mean_squared_error(tensor, result_np)
-        
+
         device_used = "GPU" if gpus else "CPU"
         print(f"    Device: {device_used}")
         print(f"    Time: {elapsed_time:.4f}s")
@@ -109,6 +109,9 @@ except ImportError:
     print("\nTensorFlow not available. Install with: pip install tensorflow")
 except Exception as e:
     print(f"\nError with TensorFlow: {type(e).__name__}: {e}")
+
+# Reset to numpy
+set_backend('numpy')
 
 # ============================================
 # Performance Comparison
@@ -129,7 +132,7 @@ print("""
    - Check: tf.config.list_physical_devices('GPU')
 
 3. Performance Tips:
-   - GPU acceleration is most beneficial for larger tensors (>100³)
+   - GPU acceleration is most beneficial for larger tensors (>100^3)
    - For small tensors, CPU might be faster due to overhead
    - Ensure CUDA and cuDNN are properly installed
    - Monitor GPU memory usage with nvidia-smi
@@ -143,4 +146,3 @@ print("""
 print("=" * 60)
 print("Example completed!")
 print("=" * 60)
-

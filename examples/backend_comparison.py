@@ -20,7 +20,7 @@ print(f"\nTest tensor shape: {tensor.shape}")
 # HDMR Across Available Backends
 # ============================================
 print("\n" + "-" * 60)
-print("HDMR Decomposition (NumPy, PyTorch, TensorFlow)")
+print("HDMR Reconstruction (NumPy, PyTorch, TensorFlow)")
 print("-" * 60)
 
 hdmr_backends = ['numpy', 'torch', 'tensorflow']
@@ -28,13 +28,13 @@ hdmr_backends = ['numpy', 'torch', 'tensorflow']
 for backend_name in hdmr_backends:
     try:
         set_backend(backend_name)
-        
-        # Time the decomposition
+
+        # Time the reconstruction
         start_time = time.time()
         model = HDMR(tensor, weight='avg', supports='ones')
-        result = model.decompose(order=2)
+        result = model.reconstruct(order=2)
         elapsed_time = time.time() - start_time
-        
+
         # Convert result to numpy
         try:
             import torch
@@ -42,28 +42,30 @@ for backend_name in hdmr_backends:
                 result_np = result.detach().cpu().numpy()
             else:
                 result_np = np.asarray(result)
-        except:
+        except ImportError:
             try:
                 import tensorflow as tf
                 if isinstance(result, tf.Tensor):
                     result_np = result.numpy()
                 else:
                     result_np = np.asarray(result)
-            except:
+            except ImportError:
                 result_np = np.asarray(result)
-        
+
         mse = np.mean((tensor - result_np) ** 2)
-        
+
         print(f"\n{backend_name:>12}:")
         print(f"  Time: {elapsed_time:.4f}s")
         print(f"  MSE:  {mse:.6e}")
-        
-    except ValueError as e:
+
+    except (ValueError, ImportError) as e:
         print(f"\n{backend_name:>12}: Not available ({str(e)})")
     except Exception as e:
         print(f"\n{backend_name:>12}: Error - {type(e).__name__}")
 
+# Reset to numpy
+set_backend('numpy')
+
 print("\n" + "=" * 60)
 print("Backend comparison completed!")
 print("=" * 60)
-

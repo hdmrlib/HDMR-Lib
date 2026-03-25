@@ -36,7 +36,7 @@ weight_types = ['avg', 'gaussian', 'chebyshev']
 
 for weight in weight_types:
     model = HDMR(tensor, weight=weight, supports='ones')
-    result = model.decompose(order=2)
+    result = model.reconstruct(order=2)
     mse = mean_squared_error(tensor, result)
     print(f"{weight:>12}: MSE = {mse:.6e}")
 
@@ -51,7 +51,7 @@ support_types = ['ones', 'das']
 
 for supports in support_types:
     model = EMPR(tensor, supports=supports)
-    result = model.decompose(order=2)
+    result = model.reconstruct(order=2)
     mse = mean_squared_error(tensor, result)
     print(f"{supports:>12}: MSE = {mse:.6e}")
 
@@ -69,7 +69,7 @@ custom_supports = [
 ]
 
 model = EMPR(tensor, supports='custom', custom_supports=custom_supports)
-result = model.decompose(order=2)
+result = model.reconstruct(order=2)
 mse = mean_squared_error(tensor, result)
 print(f"Custom supports MSE: {mse:.6e}")
 
@@ -81,20 +81,19 @@ print("Sensitivity Analysis")
 print("-" * 60)
 
 model = EMPR(tensor, supports='das')
-components = model.components(max_order=2)
+components = model.components()
 
 # Analyze specific components
-print("\nAnalyzing components: g1, g2, g12")
-sensitivity_analysis(tensor, components, ['g1', 'g2', 'g12'])
+print("\nAnalyzing components: g_1, g_2, g_1,2")
+sensitivity_analysis(tensor, components, ['g_1', 'g_2', 'g_1,2'])
 
 # Get results as dictionary
-result_dict = sensitivity_analysis(tensor, components, ['g1', 'g2'], return_dict=True)
+result_dict = sensitivity_analysis(tensor, components, ['g_1', 'g_2'], return_dict=True)
 print(f"\nProgrammatic access:")
-print(f"  g1 effect: {result_dict['individual_effects']['g1']:.2f}%")
-print(f"  g2 effect: {result_dict['individual_effects']['g2']:.2f}%")
+print(f"  g_1 effect: {result_dict['individual_effects']['g_1']:.2f}%")
+print(f"  g_2 effect: {result_dict['individual_effects']['g_2']:.2f}%")
 print(f"  Combined: {result_dict['combined_effect']:.2f}%")
 
 print("\n" + "=" * 60)
 print("Advanced example completed successfully!")
 print("=" * 60)
-

@@ -4,7 +4,7 @@ HDMR-Lib: High Dimensional Model Representation and Enhanced Multivariate Produc
 A Python library for tensor decomposition using HDMR and EMPR methods with multi-backend support.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 __author__ = "HDMR-Lib Contributors"
 __license__ = "MIT"
 
