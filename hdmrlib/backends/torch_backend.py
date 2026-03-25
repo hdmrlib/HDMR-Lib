@@ -121,10 +121,10 @@ class TorchBackend(BaseBackend):
                 else:
                     ind += 1
             # Second part
-            subtracted = torch.squeeze((self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]]) * self.g0)
+            subtracted = torch.squeeze((self.support_vectors[involved_dims[0]]) * self.g0)
             for i in range(1, len(involved_dims)):
                 subtracted = torch.einsum('...i, jk->...ij', subtracted, 
-                                        (self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]]))
+                                        (self.support_vectors[involved_dims[i]]))
             # Third part
             if len(involved_dims) > 1:
                 for i in range(1, len(involved_dims)):
@@ -133,7 +133,7 @@ class TorchBackend(BaseBackend):
                         term = torch.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                         for k in range(len(s)):
                             term = torch.einsum('...i, jk->...ij', term, 
-                                              (self.support_vectors[s[k]] * self.weights[s[k]]))
+                                              (self.support_vectors[s[k]]))
                         subtracted += torch.permute(term, np.argsort(list(g_combination) + s).tolist())
             G_component = torch.squeeze(G_component)
             subtracted = torch.squeeze(subtracted)
@@ -143,10 +143,10 @@ class TorchBackend(BaseBackend):
         def calculate_approximation(self, order):
             involved_dims = np.arange(len(self.dimensions))
             # First part
-            overall_sum = torch.squeeze((self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]]) * self.g0)
+            overall_sum = torch.squeeze((self.support_vectors[involved_dims[0]] * self.g0))
             for i in range(1, len(involved_dims)):
                 overall_sum = torch.einsum('...i, jk->...ij', overall_sum, 
-                                         (self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]]))
+                                         (self.support_vectors[involved_dims[i]]))
             # Second-N'th part
             for i in range(1, order+1):
                 for g_combination in combinations(involved_dims, i):
@@ -154,7 +154,7 @@ class TorchBackend(BaseBackend):
                     term = torch.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                     for k in range(len(s)):
                         term = torch.einsum('...i, jk->...ij', term, 
-                                          (self.support_vectors[s[k]] * self.weights[s[k]]))
+                                          (self.support_vectors[s[k]]))
                     overall_sum += torch.permute(term, np.argsort(list(g_combination) + s).tolist())
             return torch.squeeze(overall_sum)
 
@@ -242,10 +242,10 @@ class TorchBackend(BaseBackend):
                 else:
                     ind += 1
             # Second part
-            subtracted = torch.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
+            subtracted = torch.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 subtracted = torch.einsum('...i,jk->...ij', subtracted, 
-                                        self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
+                                        self.support_vectors[involved_dims[i]])
             # Third part
             if len(involved_dims) > 1:
                 for i in range(1, len(involved_dims)):
@@ -254,7 +254,7 @@ class TorchBackend(BaseBackend):
                         term = torch.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                         for k in range(len(s)):
                             term = torch.einsum('...i,jk->...ij', term, 
-                                              self.support_vectors[s[k]] * self.weights[s[k]])
+                                              self.support_vectors[s[k]])
                         subtracted += term.permute(tuple(np.argsort(list(g_combination) + s)))
             G_component = torch.squeeze(G_component)
             subtracted = torch.squeeze(subtracted)
@@ -264,10 +264,10 @@ class TorchBackend(BaseBackend):
         def calculate_approximation(self, order):
             involved_dims = np.arange(len(self.dimensions))
             # First part
-            overall_sum = torch.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
+            overall_sum = torch.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 overall_sum = torch.einsum('...i,jk->...ij', overall_sum, 
-                                      self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
+                                      self.support_vectors[involved_dims[i]])
             # Second-N'th part
             for i in range(1, order+1):
                 for g_combination in combinations(involved_dims, i):
@@ -275,7 +275,7 @@ class TorchBackend(BaseBackend):
                     term = torch.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                     for k in range(len(s)):
                         term = torch.einsum('...i,jk->...ij', term, 
-                                          self.support_vectors[s[k]] * self.weights[s[k]])
+                                          self.support_vectors[s[k]])
                     overall_sum += term.permute(tuple(np.argsort(list(g_combination) + s)))
             return torch.squeeze(overall_sum)
 
