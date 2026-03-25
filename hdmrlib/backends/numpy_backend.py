@@ -111,10 +111,10 @@ class NumPyBackend(BaseBackend):
                 else:
                     ind += 1
             # Second part
-            subtracted = np.squeeze((self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]]) * self.g0)
+            subtracted = np.squeeze((self.support_vectors[involved_dims[0]] * self.g0))
             for i in range(1, len(involved_dims)):
                 subtracted = np.einsum('...i,jk->...ij', subtracted, 
-                                     (self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]]))
+                                     (self.support_vectors[involved_dims[i]]))
             # Third part
             if len(involved_dims) > 1:
                 for i in range(1, len(involved_dims)):
@@ -123,7 +123,7 @@ class NumPyBackend(BaseBackend):
                         term = np.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                         for k in range(len(s)):
                             term = np.einsum('...i,jk->...ij', term, 
-                                           (self.support_vectors[s[k]] * self.weights[s[k]]))
+                                           (self.support_vectors[s[k]]))
                         subtracted += np.transpose(term, axes=np.argsort(list(g_combination) + s))
             G_component = np.squeeze(G_component)
             subtracted = np.squeeze(subtracted)
@@ -133,10 +133,10 @@ class NumPyBackend(BaseBackend):
         def calculate_approximation(self, order):
             involved_dims = np.arange(len(self.dimensions))
             # First part
-            overall_sum = np.squeeze((self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]]) * self.g0)
+            overall_sum = np.squeeze((self.support_vectors[involved_dims[0]] * self.g0))
             for i in range(1, len(involved_dims)):
                 overall_sum = np.einsum('...i,jk->...ij', overall_sum, 
-                                      (self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]]))
+                                      (self.support_vectors[involved_dims[i]]))
             # Second-N'th part
             for i in range(1, order+1):
                 for g_combination in combinations(involved_dims, i):
@@ -144,7 +144,7 @@ class NumPyBackend(BaseBackend):
                     term = np.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                     for k in range(len(s)):
                         term = np.einsum('...i,jk->...ij', term, 
-                                       (self.support_vectors[s[k]] * self.weights[s[k]]))
+                                       (self.support_vectors[s[k]]))
                     overall_sum += np.transpose(term, axes=np.argsort(list(g_combination) + s))
             return np.squeeze(overall_sum)
 
@@ -229,10 +229,10 @@ class NumPyBackend(BaseBackend):
                 else:
                     ind += 1
             # Second part
-            subtracted = np.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
+            subtracted = np.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 subtracted = np.einsum('...i,jk->...ij', subtracted, 
-                                     self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
+                                     self.support_vectors[involved_dims[i]])
             # Third part
             if len(involved_dims) > 1:
                 for i in range(1, len(involved_dims)):
@@ -241,7 +241,7 @@ class NumPyBackend(BaseBackend):
                         term = np.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                         for k in range(len(s)):
                             term = np.einsum('...i,jk->...ij', term, 
-                                           self.support_vectors[s[k]] * self.weights[s[k]])
+                                           self.support_vectors[s[k]])
                         subtracted += np.transpose(term, np.argsort(list(g_combination) + s))
             G_component = np.squeeze(G_component)
             subtracted = np.squeeze(subtracted)
@@ -251,10 +251,10 @@ class NumPyBackend(BaseBackend):
         def calculate_approximation(self, order):
             involved_dims = np.arange(len(self.dimensions))
             # First part
-            overall_sum = np.squeeze(self.support_vectors[involved_dims[0]] * self.weights[involved_dims[0]] * self.g0)
+            overall_sum = np.squeeze(self.support_vectors[involved_dims[0]] * self.g0)
             for i in range(1, len(involved_dims)):
                 overall_sum = np.einsum('...i,jk->...ij', overall_sum, 
-                                      self.support_vectors[involved_dims[i]] * self.weights[involved_dims[i]])
+                                      self.support_vectors[involved_dims[i]])
             # Second-N'th part
             for i in range(1, order+1):
                 for g_combination in combinations(involved_dims, i):
@@ -262,7 +262,7 @@ class NumPyBackend(BaseBackend):
                     term = np.squeeze(self.g_components[self.convert_g_to_string(g_combination)])
                     for k in range(len(s)):
                         term = np.einsum('...i,jk->...ij', term, 
-                                       self.support_vectors[s[k]] * self.weights[s[k]])
+                                       self.support_vectors[s[k]])
                     overall_sum += np.transpose(term, np.argsort(list(g_combination) + s))
             return np.squeeze(overall_sum)
 
