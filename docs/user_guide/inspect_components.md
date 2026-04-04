@@ -59,9 +59,3 @@ selected = hdmr.components(elements=["g_1", "g_2", "g_1,2"])
 - `components()` returns the stored component dictionary
 - component keys use one-based indexing
 - selected keys must exist in the component dictionary
-
-## Next
-
-- **Reconstruct Data** shows how to build lower-order approximations
-- **Work with Backends** covers backend-specific tensor behavior
-- **Fundamentals** explains the meaning of component terms
