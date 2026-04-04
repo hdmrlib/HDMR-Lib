@@ -15,6 +15,6 @@ prepare_data
 run_a_decomposition
 inspect_components
 reconstruct_data
-work_with_backends
+backends
 troubleshoot
 ```
