@@ -79,23 +79,6 @@ components = empr.components()
 
 print(type(components))
 ```
-
----
-
-## Backend Selection
-
-You can explicitly set the backend:
-
-```python
-from hdmrlib.backend import set_backend
-
-set_backend("numpy")      # default
-set_backend("torch")      # requires PyTorch
-set_backend("tensorflow") # requires TensorFlow
-```
-
-If a backend is not installed, an error will be raised.
-
 ---
 
 ## Troubleshooting
