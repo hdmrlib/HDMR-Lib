@@ -103,9 +103,3 @@ Both calls return decomposition objects. The next steps are typically:
 - inspect component terms
 - reconstruct lower-order approximations
 - compare different decomposition orders
-
-## Next
-
-- **Inspect Components** shows how to access component terms
-- **Reconstruct Data** shows how to rebuild lower-order approximations
-- **Work with Backends** covers runtime backend selection
