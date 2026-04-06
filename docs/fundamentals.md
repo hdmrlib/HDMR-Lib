@@ -8,9 +8,9 @@ High-dimensional functions and tensors are difficult to analyze directly because
 
 ## High-Dimensional Model Representation (HDMR)
 
-Let :math:`f(\mathbf{x}) = f(x_1, x_2, \dots, x_d)` be a multivariate function.
+Let f(**x**) = f(x<sub>1</sub>, x<sub>2</sub>, ..., x<sub>d</sub>) be a multivariate function.
 
-HDMR represents :math:`f` as a hierarchy of lower-order terms:
+HDMR represents f as a hierarchy of lower-order terms:
 
 ```{math}
 f(\mathbf{x}) = f_0
@@ -20,7 +20,7 @@ f(\mathbf{x}) = f_0
 + f_{12\ldots d}(x_1, \ldots, x_d)
 ```
 
-Here, :math:`f_0` is a constant term, :math:`f_i(x_i)` are first-order terms, and :math:`f_{ij}(x_i, x_j)` are second-order interaction terms.
+Here, f<sub>0</sub> is a constant term, f<sub>i</sub>(x<sub>i</sub>) are first-order terms, and f<sub>ij</sub>(x<sub>i</sub>, x<sub>j</sub>) are second-order interaction terms.
 
 The key idea is that many systems are dominated by low-order effects, so a truncated expansion often provides a useful approximation.
 
@@ -38,23 +38,23 @@ Both HDMR and EMPR are organized by term order.
 
 ### Zeroth-order term
 
-The zeroth-order term :math:`f_0` is the constant baseline. It captures the global reference level of the function or tensor.
+The zeroth-order term f<sub>0</sub> is the constant baseline. It captures the global reference level of the function or tensor.
 
 ### First-order terms
 
-A first-order term depends on a single variable, for example :math:`f_i(x_i)`. It describes the isolated contribution of one variable, independent of interactions with other variables.
+A first-order term depends on a single variable, for example f<sub>i</sub>(x<sub>i</sub>). It describes the isolated contribution of one variable, independent of interactions with other variables.
 
 ### Second-order terms
 
-A second-order term depends on two variables, for example :math:`f_{ij}(x_i, x_j)`. It captures pairwise interactions that cannot be explained by the corresponding first-order terms alone.
+A second-order term depends on two variables, for example f<sub>ij</sub>(x<sub>i</sub>, x<sub>j</sub>). It captures pairwise interactions that cannot be explained by the corresponding first-order terms alone.
 
 ### Higher-order terms
 
-Higher-order terms involve three or more variables, such as :math:`f_{ijk}(x_i, x_j, x_k)`. These terms represent increasingly complex interactions.
+Higher-order terms involve three or more variables, such as f<sub>ijk</sub>(x<sub>i</sub>, x<sub>j</sub>, x<sub>k</sub>). These terms represent increasingly complex interactions.
 
 ### Truncation
 
-A decomposition truncated at order :math:`m` keeps only terms up to that order:
+A decomposition truncated at order m keeps only terms up to that order:
 
 ```{math}
 f^{(m)}(\mathbf{x}) = \sum_{\lvert u \rvert \le m} f_u(\mathbf{x}_u)
@@ -66,7 +66,7 @@ This is the mathematical basis for lower-order approximation and reconstruction.
 
 In **HDMR-Lib**, both HDMR and EMPR are implemented for tensor-valued data using per-dimension support vectors.
 
-Let the tensor have :math:`d` dimensions. Then each dimension is associated with a support vector :math:`s_i \in \mathbb{R}^{n_i}`, where :math:`n_i` is the size of the :math:`i`-th mode.
+Let the tensor have d dimensions. Then each dimension is associated with a support vector s<sub>i</sub> ∈ ℝ<sup>n<sub>i</sub></sup>, where n<sub>i</sub> is the size of the i-th mode.
 
 ### HDMR in the library
 
@@ -83,11 +83,11 @@ G \times_1 (s_1 \odot w_1)^\top
 
 Here:
 
-- :math:`G` is the input tensor
-- :math:`s_i` is the support vector for dimension :math:`i`
-- :math:`w_i` is the corresponding weight vector
-- :math:`\odot` denotes elementwise multiplication
-- :math:`\times_k` denotes contraction along mode :math:`k`
+- G is the input tensor
+- s<sub>i</sub> is the support vector for dimension i
+- w<sub>i</sub> is the corresponding weight vector
+- ⊙ denotes elementwise multiplication
+- ×<sub>k</sub> denotes contraction along mode k
 
 Higher-order HDMR terms are then obtained recursively after removing lower-order contributions.
 
@@ -115,7 +115,7 @@ In the current implementation,
 \alpha_i = \frac{1}{n_i}
 ```
 
-for a mode of size :math:`n_i`.
+for a mode of size n<sub>i</sub>.
 
 This reflects the current code path in **HDMR-Lib**: EMPR uses support vectors directly, while HDMR uses support vectors together with explicit weight vectors.
 
