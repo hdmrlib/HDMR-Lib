@@ -5,3 +5,4 @@ sphinx-autodoc-typehints>=1.25
 sphinx-design
 sphinx-copybutton
 sphinx-gallery
+matplotlib
