@@ -14,7 +14,7 @@ import numpy as np
 from hdmrlib import EMPR
 
 
-image_path = Path("_static/examples/squirell.png")
+image_path = Path("docs/_static/examples/squirell.png")
 
 # Load the image.
 X = plt.imread(image_path)
