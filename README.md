@@ -51,6 +51,42 @@ pip install -e .
 pip install -e .[dev]
 ```
 
+### Running Tests
+
+Run the test suite from the repository root after installing the development dependencies.
+
+**NumPy-only test run**
+
+This is the fastest option and works with the default dependency set.
+
+```bash
+pip install -e '.[dev]'
+python -m pytest
+```
+
+**Full backend test run**
+
+Install the optional PyTorch and TensorFlow backends to run the complete suite.
+
+```bash
+pip install -e '.[dev,all]'
+python -m pytest
+```
+
+**Coverage report**
+
+Generate a terminal coverage report for the `hdmrlib` package:
+
+```bash
+python -m pytest --cov=hdmrlib --cov-report=term-missing
+```
+
+If Matplotlib cache warnings appear in restricted environments, run tests with a writable cache directory:
+
+```bash
+MPLCONFIGDIR=/tmp/mpl python -m pytest --cov=hdmrlib --cov-report=term-missing
+```
+
 ### GPU Acceleration (Optional)
 
 For CUDA/GPU support:
@@ -411,7 +447,7 @@ We welcome contributions! To contribute:
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature-name`
 3. Make your changes and add tests
-4. Run tests: `python -m pytest tests/`
+4. Run tests: `python -m pytest`
 5. Submit a pull request
 
 ---
