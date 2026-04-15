@@ -66,7 +66,7 @@ sphinx_gallery_conf = {
     "filename_pattern": r"plot_",
     "subsection_order": [
         "examples/general_examples",
-        "examples/decomposition_examples",
+        "examples/decomposition_workflows",
         "examples/research_examples",
     ],
     "within_subsection_order": "FileNameSortKey",
