@@ -238,3 +238,16 @@ div.highlight pre {
   padding: 0.9rem;
   border-radius: 10px;
 }
+
+/* Hide rightmost sidebar/toc toggle icon */
+.sidebar-toggle,
+.primary-toggle,
+.secondary-toggle,
+button.sidebar-toggle,
+button.primary-toggle,
+button.secondary-toggle,
+label.sidebar-toggle,
+label.primary-toggle,
+label.secondary-toggle {
+  display: none !important;
+}
