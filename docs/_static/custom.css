@@ -1,40 +1,188 @@
-/* Navbar brand/logo sizing */
+/* Header */
+.bd-header.navbar {
+  min-height: 92px;
+  background: #ffffff !important;
+  border-bottom: 1px solid #e9ecef;
+  box-shadow: none !important;
+}
+
+/* Main header layout */
+.bd-header .navbar-header-items {
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+
+.bd-header .navbar-header-items__start {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 1rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bd-header .navbar-header-items__center {
+  display: none !important;
+}
+
+.bd-header .navbar-header-items__end {
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 0.75rem;
+  flex-wrap: nowrap !important;
+}
+
+/* Container alignment */
+.bd-header .container-xl,
+.bd-header .container-fluid {
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Brand */
+.bd-header .navbar-brand {
+  margin-right: 1.2rem;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
 .bd-header .navbar-brand img {
-  height: 52px;
+  height: 56px;
   width: auto;
+  max-height: 56px;
 }
 
-/* Navbar link sizing */
+/* Brand text */
+.bd-header .navbar-brand,
+.bd-header .navbar-brand .title,
+.bd-header .navbar-brand__title,
+.navbar-brand p {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #304b72 !important;
+  white-space: nowrap;
+  margin-bottom: 0 !important;
+}
+
+/* Navigation links */
+.bd-header .navbar-nav {
+  gap: 0.2rem;
+  flex-wrap: nowrap !important;
+}
+
+.bd-header .navbar-nav .nav-item {
+  white-space: nowrap;
+}
+
 .bd-header .navbar-nav .nav-link {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 500;
+  color: #5f6f8a !important;
+  padding: 0.35rem 0.7rem;
+  white-space: nowrap;
 }
 
-/* Search button sizing */
+.bd-header .navbar-nav .nav-link:hover,
+.bd-header .navbar-nav .current > .nav-link,
+.bd-header .navbar-nav .active > .nav-link {
+  color: #304b72 !important;
+}
+
+/* Search */
 .bd-search .search-button__button,
 .search-button__button {
-  font-size: 0.95rem;
-  padding: 0.45rem 0.85rem;
-  min-width: 180px;
+  background: #ffffff !important;
+  border: 1px solid #d6dbe3 !important;
+  border-radius: 999px !important;
+  color: #5f6f8a !important;
+  font-size: 1rem !important;
+  padding: 0.55rem 1rem !important;
+  min-width: 150px;
+  box-shadow: none !important;
 }
 
-/* Hide keyboard shortcut hint inside search */
+.bd-search .search-button__button:hover,
+.search-button__button:hover {
+  border-color: #bcc6d4 !important;
+  color: #304b72 !important;
+}
+
+/* Hide search shortcut hints */
 .search-button__kbd-shortcut,
-kbd.kbd-shortcut,
-.search-button kbd {
-  display: none !important;
-}
-
-/* Search page input shortcut hint */
+.search-button kbd,
 .bd-search kbd,
-.search-field kbd,
-.search-container kbd {
+kbd.kbd-shortcut {
   display: none !important;
 }
 
-/* Header height */
-.bd-header.navbar {
-  min-height: 80px;
+/* Search icon spacing */
+.search-button__button svg,
+.search-button__button i {
+  margin-right: 0.35rem;
+}
+
+/* Icon links */
+.navbar-icon-links a,
+.bd-header .navbar-icon-links a {
+  color: #5f6f8a !important;
+  font-size: 1.15rem;
+  margin-left: 0.45rem;
+}
+
+.navbar-icon-links a:hover,
+.bd-header .navbar-icon-links a:hover {
+  color: #304b72 !important;
+}
+
+/* Hide any remaining theme switch button just in case */
+.theme-switch-button,
+button.theme-switch-button,
+.navbar-theme-button {
+  display: none !important;
+}
+
+/* Hamburger */
+.navbar-toggler {
+  color: #5f6f8a !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Prevent ugly wrapping in top bar */
+.bd-header * {
+  word-break: normal;
+}
+
+/* Medium screens: hide nav before it wraps into multiple lines */
+@media (max-width: 1200px) {
+  .bd-header .navbar-nav {
+    display: none !important;
+  }
+}
+
+/* Smaller screens */
+@media (max-width: 900px) {
+  .bd-header .navbar-brand img {
+    height: 48px;
+    max-height: 48px;
+  }
+
+  .bd-header .navbar-brand,
+  .bd-header .navbar-brand .title,
+  .bd-header .navbar-brand__title,
+  .navbar-brand p {
+    font-size: 1.15rem;
+  }
+
+  .bd-search .search-button__button,
+  .search-button__button {
+    min-width: 120px;
+    padding: 0.45rem 0.8rem !important;
+    font-size: 0.95rem !important;
+  }
 }
 
 /* Typography tightening */
@@ -42,12 +190,12 @@ h1, h2, h3 {
   letter-spacing: -0.01em;
 }
 
-/* Cards (sphinx-design) */
+/* Cards */
 .sd-card {
   border-radius: 14px;
 }
 
-/* Code blocks: a bit nicer spacing */
+/* Code blocks */
 div.highlight pre {
   padding: 0.9rem;
   border-radius: 10px;
