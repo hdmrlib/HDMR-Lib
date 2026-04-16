@@ -1,6 +1,40 @@
 /* Navbar brand/logo sizing */
 .bd-header .navbar-brand img {
-  height: 28px;
+  height: 52px;
+  width: auto;
+}
+
+/* Navbar link sizing */
+.bd-header .navbar-nav .nav-link {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* Search button sizing */
+.bd-search .search-button__button,
+.search-button__button {
+  font-size: 0.95rem;
+  padding: 0.45rem 0.85rem;
+  min-width: 180px;
+}
+
+/* Hide keyboard shortcut hint inside search */
+.search-button__kbd-shortcut,
+kbd.kbd-shortcut,
+.search-button kbd {
+  display: none !important;
+}
+
+/* Search page input shortcut hint */
+.bd-search kbd,
+.search-field kbd,
+.search-container kbd {
+  display: none !important;
+}
+
+/* Header height */
+.bd-header.navbar {
+  min-height: 80px;
 }
 
 /* Typography tightening */

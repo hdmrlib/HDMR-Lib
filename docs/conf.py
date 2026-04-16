@@ -37,11 +37,15 @@ html_css_files = ["custom.css"]
 html_logo = "_static/logo.jpg"
 html_favicon = "_static/logo.jpg"
 
+html_context = {
+    "default_mode": "light",
+}
+
 html_theme_options = {
     "github_url": "https://github.com/hdmrlib/HDMR-Lib",
     "navbar_start": ["navbar-logo"],
     "navbar_center": ["navbar-nav"],
-    "navbar_end": ["navbar-icon-links", "theme-switcher"],
+    "navbar_end": ["navbar-icon-links"],
     "secondary_sidebar_items": ["page-toc", "edit-this-page", "sourcelink"],
     "show_prev_next": True,
     "icon_links": [
