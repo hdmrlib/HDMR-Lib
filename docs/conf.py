@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import sys
 
-# Repo root'u Python path'e ekle (hdmrlib import edilsin)
 sys.path.insert(0, os.path.abspath(".."))
 
 project = "HDMR-Lib"
@@ -42,10 +41,12 @@ html_context = {
 }
 
 html_theme_options = {
-    "github_url": "https://github.com/hdmrlib/HDMR-Lib",
-    "navbar_start": ["navbar-logo"],
-    "navbar_center": ["navbar-nav"],
-    "navbar_end": ["navbar-icon-links"],
+    "logo": {
+        "text": "HDMR-Lib",
+    },
+    "navbar_start": ["navbar-logo", "navbar-nav"],
+    "navbar_center": [],
+    "navbar_end": ["search-button", "navbar-icon-links"],
     "secondary_sidebar_items": ["page-toc", "edit-this-page", "sourcelink"],
     "show_prev_next": True,
     "icon_links": [
