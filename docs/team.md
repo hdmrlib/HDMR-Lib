@@ -26,4 +26,3 @@ We aim to make the library useful both as a research tool and as a software foun
 ## Contact and repository
 
 - **Source code:** [GitHub repository](https://github.com/hdmrlib/HDMR-Lib)
-- **Documentation:** [Documentation website](https://hdmrlib.github.io/HDMR-Lib/)
