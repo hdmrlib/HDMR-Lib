@@ -436,6 +436,41 @@ body.show-user-guide-sidebar .sidebar-primary-items__end {
 }
 
 /* =========================
+   Hide secondary sidebar completely
+========================= */
+.bd-sidebar-secondary,
+.bd-sidebar-secondary-primary,
+.secondary-sidebar {
+  display: none !important;
+  border-left: none !important;
+  box-shadow: none !important;
+}
+
+.bd-sidebar-secondary::before,
+.bd-sidebar-secondary::after,
+.bd-sidebar-secondary-primary::before,
+.bd-sidebar-secondary-primary::after,
+.secondary-sidebar::before,
+.secondary-sidebar::after {
+  display: none !important;
+  content: none !important;
+  border: none !important;
+}
+
+/* Hide Show Source / Edit buttons in the secondary sidebar */
+.editthispage,
+.editthispage a,
+.bd-sidebar-secondary .tocsection,
+.bd-sidebar-secondary .theme-switch-button,
+.bd-sidebar-secondary .sourcelink,
+.bd-sidebar-secondary .editthispage,
+a[href*="_sources/"],
+a[href$=".md.txt"],
+a[href$=".rst.txt"] {
+  display: none !important;
+}
+
+/* =========================
    Cards / code blocks / surfaces
 ========================= */
 .sd-card {
@@ -503,18 +538,6 @@ label.secondary-toggle {
   display: none !important;
 }
 
-/* Hide Show Source / Edit buttons in the secondary sidebar */
-.editthispage,
-.editthispage a,
-.bd-sidebar-secondary .tocsection,
-.bd-sidebar-secondary .theme-switch-button,
-.bd-sidebar-secondary .sourcelink,
-.bd-sidebar-secondary .editthispage,
-a[href*="_sources/"],
-a[href$=".md.txt"],
-a[href$=".rst.txt"] {
-  display: none !important;
-}
 /* =========================
    Responsive
 ========================= */
