@@ -1,9 +1,9 @@
-# About Us
-The project was developed by:
+# Team
+The library was developed by:
 
-- **Pınar Yalçın Güler**
-- **Muhammed Enis Şen**
-- **Buğra Eyidoğan**
+- [**Pınar Yalçın Güler**](https://github.com/yalcinp)  
+- [**Muhammed Enis Şen**](https://github.com/MEnisSen)  
+- [**Buğra Eyidoğan**](https://github.com/bugraeydo)
 
 
 ## Why we built this library
@@ -25,5 +25,5 @@ We aim to make the library useful both as a research tool and as a software foun
 
 ## Contact and repository
 
-- **Source code:** `https://github.com/hdmrlib/HDMR-Lib`
-- **Documentation:** `https://hdmrlib.github.io/HDMR-Lib/`
+- **Source code:** [GitHub repository](https://github.com/hdmrlib/HDMR-Lib)
+- **Documentation:** [Documentation website](https://hdmrlib.github.io/HDMR-Lib/)
