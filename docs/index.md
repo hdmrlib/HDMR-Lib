@@ -56,4 +56,5 @@ user_guide/index
 fundamentals
 auto_examples/index
 api
+team
 ```

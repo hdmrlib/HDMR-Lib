@@ -25,8 +25,6 @@ extensions = [
 autosummary_generate = True
 templates_path = ["_templates"]
 exclude_patterns = ["_build"]
-
-# Optional deps yüzünden docs build patlamasın:
 autodoc_mock_imports = ["torch", "tensorflow"]
 
 html_theme = "pydata_sphinx_theme"
