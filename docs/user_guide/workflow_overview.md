@@ -1,8 +1,8 @@
 # Library Organization and Workflow Overview
 
-This page provides a high-level overview of the main HDMR-Lib objects and the typical workflow used throughout the user guide.
+This page provides a high-level overview of the main HDMRLib objects and the typical workflow used throughout the user guide.
 
-HDMR-Lib is organized around a small set of core interfaces for decomposition and backend management. In most workflows, users will:
+HDMRLib is organized around a small set of core interfaces for decomposition and backend management. In most workflows, users will:
 
 1. prepare input data
 2. choose a backend if needed
@@ -76,7 +76,7 @@ This is useful when studying how well lower-order structure explains the origina
 
 ## Backend management
 
-HDMR-Lib supports multiple computational backends. The main backend utilities are:
+HDMRLib supports multiple computational backends. The main backend utilities are:
 
 - `set_backend(...)` to select a backend
 - `get_backend()` to inspect the currently active backend
@@ -92,11 +92,11 @@ backend = get_backend()
 
 This allows the same high-level workflow to be used across supported backends such as NumPy, PyTorch, and TensorFlow.
 
-In many cases, the default backend is sufficient. Backend selection becomes more relevant when integrating HDMR-Lib into tensor-based or GPU-enabled workflows.
+In many cases, the default backend is sufficient. Backend selection becomes more relevant when integrating HDMRLib into tensor-based or GPU-enabled workflows.
 
 ## Typical workflow
 
-A typical HDMR-Lib workflow looks like this:
+A typical HDMRLib workflow looks like this:
 
 ### 1. Prepare the input
 Organize the input data into a supported tensor or array format.

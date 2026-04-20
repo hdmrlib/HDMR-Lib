@@ -1,5 +1,5 @@
 """
-Backend comparison example for HDMR-Lib
+Backend comparison example for HDMRLib
 Demonstrates usage across different computational backends
 """
 
@@ -9,7 +9,7 @@ from hdmrlib import HDMR, EMPR, set_backend
 from hdmrlib.metrics import mean_squared_error
 
 print("=" * 60)
-print("HDMR-Lib Backend Comparison")
+print("HDMRLib Backend Comparison")
 print("=" * 60)
 
 # Create test tensor

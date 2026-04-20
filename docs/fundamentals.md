@@ -1,6 +1,6 @@
 # Fundamentals
 
-This page introduces the main mathematical ideas behind **High-Dimensional Model Representation (HDMR)** and **Enhanced Multivariate Products Representation (EMPR)** in **HDMR-Lib**.
+This page introduces the main mathematical ideas behind **High-Dimensional Model Representation (HDMR)** and **Enhanced Multivariate Products Representation (EMPR)** in **HDMRLib**.
 
 ## Why HDMR and EMPR?
 
@@ -64,7 +64,7 @@ This is the mathematical basis for lower-order approximation and reconstruction.
 
 ## Support Vectors and Weights
 
-In **HDMR-Lib**, both HDMR and EMPR are implemented for tensor-valued data using per-dimension support vectors.
+In **HDMRLib**, both HDMR and EMPR are implemented for tensor-valued data using per-dimension support vectors.
 
 Let the tensor have d dimensions. Then each dimension is associated with a support vector s<sub>i</sub> ∈ ℝ<sup>n<sub>i</sub></sup>, where n<sub>i</sub> is the size of the i-th mode.
 
@@ -117,7 +117,7 @@ In the current implementation,
 
 for a mode of size n<sub>i</sub>.
 
-This reflects the current code path in **HDMR-Lib**: EMPR uses support vectors directly, while HDMR uses support vectors together with explicit weight vectors.
+This reflects the current code path in **HDMRLib**: EMPR uses support vectors directly, while HDMR uses support vectors together with explicit weight vectors.
 
 ## HDMR and EMPR in Tensor Form
 
@@ -150,7 +150,7 @@ The main conceptual difference is the role of support functions.
 - **HDMR** is most naturally introduced as a hierarchical functional decomposition
 - **EMPR** uses support functions explicitly as part of the representation
 
-In the current **HDMR-Lib** implementation, both methods operate on tensors and both rely on support vectors at the implementation level. The difference appears in how the component terms are computed:
+In the current **HDMRLib** implementation, both methods operate on tensors and both rely on support vectors at the implementation level. The difference appears in how the component terms are computed:
 
 - HDMR uses weighted support vectors
 - EMPR uses support vectors together with per-dimension scalar normalization

@@ -1,12 +1,12 @@
 [![PyPI version](https://img.shields.io/pypi/v/hdmrlib.svg)](https://pypi.org/project/hdmrlib/)
-[![Docs](https://img.shields.io/badge/docs-online-31557f)](https://hdmrlib.github.io/HDMR-Lib/)
+[![Docs](https://img.shields.io/badge/docs-online-31557f)](https://hdmrlib.github.io/HDMRLib/)
 [![Python versions](https://img.shields.io/pypi/pyversions/hdmrlib.svg)](https://pypi.org/project/hdmrlib/)
-[![Tests](https://img.shields.io/github/actions/workflow/status/hdmrlib/HDMR-Lib/tests.yml?branch=main&label=tests)](https://github.com/hdmrlib/HDMR-Lib/actions)
-[![License](https://img.shields.io/github/license/hdmrlib/HDMR-Lib)](https://github.com/hdmrlib/HDMR-Lib/blob/main/LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/hdmrlib/HDMRLib/tests.yml?branch=main&label=tests)](https://github.com/hdmrlib/HDMRLib/actions)
+[![License](https://img.shields.io/github/license/hdmrlib/HDMRLib)](https://github.com/hdmrlib/HDMRLib/blob/main/LICENSE)
 
-# HDMR-Lib
+# HDMRLib
 
-**HDMR-Lib** is an open-source Python library for **High-Dimensional Model Representation (HDMR)** and **Enhanced Multivariate Products Representation (EMPR)**. It provides a unified workflow for decomposition, component analysis, and lower-order reconstruction across **NumPy**, **PyTorch**, and **TensorFlow** backends.
+**HDMRLib** is an open-source Python library for **High-Dimensional Model Representation (HDMR)** and **Enhanced Multivariate Products Representation (EMPR)**. It provides a unified workflow for decomposition, component analysis, and lower-order reconstruction across **NumPy**, **PyTorch**, and **TensorFlow** backends.
 
 ## Features
 
@@ -27,8 +27,8 @@ pip install hdmrlib
 For development installation:
 
 ```bash
-git clone https://github.com/hdmrlib/HDMR-Lib.git
-cd HDMR-Lib
+git clone https://github.com/hdmrlib/HDMRLib.git
+cd HDMRLib
 pip install -e .
 ```
 
@@ -64,15 +64,15 @@ components = model.components()
 
 Full documentation is available at:
 
-- **Documentation website:** https://hdmrlib.github.io/HDMR-Lib/
-- **User Guide:** https://hdmrlib.github.io/HDMR-Lib/user_guide/index.html
-- **API Reference:** https://hdmrlib.github.io/HDMR-Lib/api.html
-- **Examples:** https://hdmrlib.github.io/HDMR-Lib/auto_examples/index.html
-- **Fundamentals:** https://hdmrlib.github.io/HDMR-Lib/fundamentals.html
+- **Documentation website:** https://hdmrlib.github.io/HDMRLib/
+- **User Guide:** https://hdmrlib.github.io/HDMRLib/user_guide/index.html
+- **API Reference:** https://hdmrlib.github.io/HDMRLib/api.html
+- **Examples:** https://hdmrlib.github.io/HDMRLib/auto_examples/index.html
+- **Fundamentals:** https://hdmrlib.github.io/HDMRLib/fundamentals.html
 
 ## Supported Backends
 
-HDMR-Lib currently supports:
+HDMRLib currently supports:
 
 - **NumPy** for standard array-based workflows
 - **PyTorch** for tensor computation and backend-integrated workflows
@@ -98,14 +98,14 @@ python -m pytest
 
 ## Citation
 
-If you use **HDMR-Lib** in academic work, please cite the associated software or publication.
+If you use **HDMRLib** in academic work, please cite the associated software or publication.
 
 ```bibtex
 @software{hdmrlib,
-  title = {HDMR-Lib: A Python Library for HDMR and EMPR},
+  title = {HDMRLib: A Python Library for HDMR and EMPR},
   author = {Pınar Yalçın Güler and Muhammed Enis Şen and Buğra Eyidoğan},
   year = {2026},
-  url = {https://github.com/hdmrlib/HDMR-Lib}
+  url = {https://github.com/hdmrlib/HDMRLib}
 }
 ```
 

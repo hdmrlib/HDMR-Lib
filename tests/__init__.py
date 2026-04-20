@@ -1,2 +1,2 @@
-# Tests package for HDMR-Lib
+# Tests package for HDMRLib
 

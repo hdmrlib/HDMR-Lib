@@ -1,12 +1,12 @@
 # Library Overview
 
-HDMR-Lib is a Python library for constructing and analyzing high-dimensional decompositions of multivariate functions represented on tensor grids.
+HDMRLib is a Python library for constructing and analyzing high-dimensional decompositions of multivariate functions represented on tensor grids.
 
 The library provides practical tools for approximating high-dimensional functions and studying their interaction structure through structured component representations.
 
 ## Core functionality
 
-HDMR-Lib implements two decomposition methods:
+HDMRLib implements two decomposition methods:
 
 - `EMPR`
 - `HDMR`
@@ -17,7 +17,7 @@ These decompositions make it possible to analyze how different variables and int
 
 ## Core objects
 
-The primary user-facing objects in HDMR-Lib are the model classes:
+The primary user-facing objects in HDMRLib are the model classes:
 
 - `EMPR`
 - `HDMR`
@@ -39,7 +39,7 @@ The same workflow applies to the `HDMR` model.
 
 ## Backend support
 
-HDMR-Lib includes a backend abstraction layer that allows computations to run on different numerical frameworks.
+HDMRLib includes a backend abstraction layer that allows computations to run on different numerical frameworks.
 
 Currently supported backends include:
 
@@ -51,7 +51,7 @@ The backend can be selected through the public interface of the library.
 
 ## Library structure
 
-At a high level, HDMR-Lib operates around three main elements:
+At a high level, HDMRLib operates around three main elements:
 
 1. **tensor inputs**, representing sampled multivariate functions
 2. **decomposition models** (`EMPR` and `HDMR`)

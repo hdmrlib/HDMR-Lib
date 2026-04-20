@@ -18,7 +18,7 @@ pip install hdmrlib
 
 ## Optional Backends
 
-HDMR-Lib supports multiple computational backends. You can install them via extras:
+HDMRLib supports multiple computational backends. You can install them via extras:
 
 ### PyTorch backend
 
@@ -45,8 +45,8 @@ pip install hdmrlib[all]
 Use this option if you want to work with the latest version of the codebase:
 
 ```bash
-git clone https://github.com/hdmrlib/HDMR-Lib.git
-cd HDMR-Lib
+git clone https://github.com/hdmrlib/HDMRLib.git
+cd HDMRLib
 pip install -e .
 ```
 

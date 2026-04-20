@@ -1,6 +1,6 @@
-# HDMR-Lib Examples
+# HDMRLib Examples
 
-This directory contains example scripts demonstrating the usage of HDMR-Lib.
+This directory contains example scripts demonstrating the usage of HDMRLib.
 
 ## Examples
 

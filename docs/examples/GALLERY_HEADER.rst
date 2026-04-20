@@ -1,5 +1,5 @@
 Examples
 ========
 
-Explore example workflows for **HDMR-Lib**, including basic decompositions,
+Explore example workflows for **HDMRLib**, including basic decompositions,
 structured workflows, and research-oriented examples.

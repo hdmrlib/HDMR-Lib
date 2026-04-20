@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-project = "HDMR-Lib"
+project = "HDMRLib"
 author = "hdmrlib"
 
 extensions = [
@@ -43,7 +43,7 @@ html_context = {
 
 html_theme_options = {
     "logo": {
-        "text": "HDMR-Lib",
+        "text": "HDMRLib",
     },
     "navbar_start": ["navbar-logo", "navbar-nav"],
     "navbar_center": [],
@@ -53,7 +53,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/hdmrlib/HDMR-Lib",
+            "url": "https://github.com/hdmrlib/HDMRLib",
             "icon": "fa-brands fa-github",
         },
         {

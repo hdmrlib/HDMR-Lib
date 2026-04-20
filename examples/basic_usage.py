@@ -1,5 +1,5 @@
 """
-Basic usage example for HDMR-Lib
+Basic usage example for HDMRLib
 Demonstrates simple HDMR and EMPR decomposition
 """
 
@@ -12,7 +12,7 @@ set_backend('numpy')
 
 # Create a sample 3D tensor
 print("=" * 60)
-print("HDMR-Lib Basic Usage Example")
+print("HDMRLib Basic Usage Example")
 print("=" * 60)
 
 tensor = np.random.rand(5, 5, 5)

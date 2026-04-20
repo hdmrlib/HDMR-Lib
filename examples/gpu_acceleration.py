@@ -1,5 +1,5 @@
 """
-GPU acceleration example for HDMR-Lib
+GPU acceleration example for HDMRLib
 Demonstrates CUDA support with PyTorch and TensorFlow backends
 """
 
@@ -9,7 +9,7 @@ from hdmrlib import HDMR, EMPR, set_backend
 from hdmrlib.metrics import mean_squared_error
 
 print("=" * 60)
-print("HDMR-Lib GPU Acceleration Example")
+print("HDMRLib GPU Acceleration Example")
 print("=" * 60)
 
 # Create a larger tensor for better GPU performance comparison

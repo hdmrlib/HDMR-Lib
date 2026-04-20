@@ -14,7 +14,7 @@ authors = [
     {name = "Muhammed Enis Sen", email = "m.enis.97@gmail.com"},
     {name = "Bugra Eyidogan", email = "bugra.eyidogan@gmail.com"},
     {name = "Pinar Guler", email = "yalcin.pinar2@gmail.com"},
-    {name = "HDMR-Lib Contributors"}
+    {name = "HDMRLib Contributors"}
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -38,10 +38,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/hdmrlib/HDMR-Lib"
-Documentation = "https://github.com/hdmrlib/HDMR-Lib#readme"
-Repository = "https://github.com/hdmrlib/HDMR-Lib"
-"Bug Tracker" = "https://github.com/hdmrlib/HDMR-Lib/issues"
+Homepage = "https://github.com/hdmrlib/HDMRLib"
+Documentation = "https://github.com/hdmrlib/HDMRLib#readme"
+Repository = "https://github.com/hdmrlib/HDMRLib"
+"Bug Tracker" = "https://github.com/hdmrlib/HDMRLib/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

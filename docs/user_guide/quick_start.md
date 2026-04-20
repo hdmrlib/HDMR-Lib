@@ -1,6 +1,6 @@
 # Quick Start
 
-HDMR-Lib supports two related decomposition formulations:
+HDMRLib supports two related decomposition formulations:
 
 - **HDMR** is useful when you want to work explicitly with HDMR-based formulations
 - **EMPR** provides the same high-level workflow through an alternative decomposition formulation

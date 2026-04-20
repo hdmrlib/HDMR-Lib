@@ -1,5 +1,5 @@
 """
-Advanced usage example for HDMR-Lib
+Advanced usage example for HDMRLib
 Demonstrates different configurations and sensitivity analysis
 """
 
@@ -11,7 +11,7 @@ from hdmrlib.metrics import mean_squared_error, sensitivity_analysis
 set_backend('numpy')
 
 print("=" * 60)
-print("HDMR-Lib Advanced Usage Example")
+print("HDMRLib Advanced Usage Example")
 print("=" * 60)
 
 # Create a known function for testing
