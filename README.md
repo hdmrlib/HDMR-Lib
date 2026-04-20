@@ -1,3 +1,4 @@
+[![Website](https://img.shields.io/badge/website-online-blue)](https://hdmrlib.github.io/HDMRLib/index.html)
 [![PyPI version](https://img.shields.io/pypi/v/hdmrlib.svg)](https://pypi.org/project/hdmrlib/)
 [![Docs](https://img.shields.io/badge/docs-online-31557f)](https://hdmrlib.github.io/HDMRLib/)
 [![Python versions](https://img.shields.io/pypi/pyversions/hdmrlib.svg)](https://pypi.org/project/hdmrlib/)
@@ -65,10 +66,6 @@ components = model.components()
 Full documentation is available at:
 
 - **Documentation website:** https://hdmrlib.github.io/HDMRLib/
-- **User Guide:** https://hdmrlib.github.io/HDMRLib/user_guide/index.html
-- **API Reference:** https://hdmrlib.github.io/HDMRLib/api.html
-- **Examples:** https://hdmrlib.github.io/HDMRLib/auto_examples/index.html
-- **Fundamentals:** https://hdmrlib.github.io/HDMRLib/fundamentals.html
 
 ## Supported Backends
 
