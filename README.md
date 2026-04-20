@@ -9,6 +9,10 @@
 
 **HDMRLib** is an open-source Python library for **High-Dimensional Model Representation (HDMR)** and **Enhanced Multivariate Products Representation (EMPR)**. It provides a unified workflow for decomposition, component analysis, and lower-order reconstruction across **NumPy**, **PyTorch**, and **TensorFlow** backends.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/hdmrlib/HDMRLib/main/docs/_static/hdmrlib.png" alt="Library Overview" width="450">
+</p>
+
 ## Features
 
 - HDMR and EMPR in one library
