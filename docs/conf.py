@@ -64,7 +64,7 @@ html_theme_options = {
     ],
 }
 
-myst_enable_extensions = ["colon_fence", "deflist", "fieldlist"]
+myst_enable_extensions = ["colon_fence", "deflist", "fieldlist", "html_image", "dollarmath"]
 
 sphinx_gallery_conf = {
     "examples_dirs": "examples",
