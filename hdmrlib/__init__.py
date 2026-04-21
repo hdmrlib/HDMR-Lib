@@ -1,3 +1,6 @@
+# Copyright (c) 2025 HDMRLib Contributors
+# SPDX-License-Identifier: MIT
+
 """
 HDMRLib: High Dimensional Model Representation and Enhanced Multivariate Products Representation
 

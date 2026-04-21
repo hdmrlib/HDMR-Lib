@@ -1,3 +1,6 @@
+# Copyright (c) 2025 HDMRLib Contributors
+# SPDX-License-Identifier: MIT
+
 import numpy as np
 from itertools import combinations
 from .base import BaseBackend

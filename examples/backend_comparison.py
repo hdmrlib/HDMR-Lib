@@ -1,3 +1,6 @@
+# Copyright (c) 2025 HDMRLib Contributors
+# SPDX-License-Identifier: MIT
+
 """
 Backend comparison example for HDMRLib
 Demonstrates usage across different computational backends

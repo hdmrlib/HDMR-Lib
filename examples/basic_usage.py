@@ -1,3 +1,6 @@
+# Copyright (c) 2025 HDMRLib Contributors
+# SPDX-License-Identifier: MIT
+
 """
 Basic usage example for HDMRLib
 Demonstrates simple HDMR and EMPR decomposition

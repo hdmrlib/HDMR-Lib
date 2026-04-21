@@ -1,3 +1,6 @@
+# Copyright (c) 2025 HDMRLib Contributors
+# SPDX-License-Identifier: MIT
+
 """
 GPU acceleration example for HDMRLib
 Demonstrates CUDA support with PyTorch and TensorFlow backends

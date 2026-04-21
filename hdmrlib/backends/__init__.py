@@ -1,3 +1,6 @@
+# Copyright (c) 2025 HDMRLib Contributors
+# SPDX-License-Identifier: MIT
+
 try:
 	from .numpy_backend import NumPyBackend
 except Exception:  # pragma: no cover
