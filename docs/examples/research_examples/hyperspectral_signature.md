@@ -7,7 +7,9 @@ This example demonstrates how to use **HDMRLib** to extract representative spect
 #### 1. Visualizing the Dataset
 Before processing, we view the spatial distribution of the hyperspectral scene to understand the terrain and ground truth classifications present in the data.
 
-![Indian Pines Ground Truth](../../_static/examples/indian_pines_gt.png)
+<p align="center">
+<img src="../../_static/examples/indian_pines_gt.png" alt="Indian Pines Ground Truth" width="40%">
+</p>
 
 #### 2. Implementation in HDMRLib
 The following script loads the Indian Pines dataset, isolates a spatial crop, and uses the `EMPR` class to extract the spectral signature components.
