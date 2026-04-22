@@ -4,7 +4,7 @@ The library was developed by:
 - [**Pınar Yalçın Güler**](https://github.com/yalcinp)  
 - [**Muhammed Enis Şen**](https://github.com/MEnisSen)  
 - [**Buğra Eyidoğan**](https://github.com/bugraeydo)
-
+- [**Süha Tuna**](https://web.itu.edu.tr/suhatuna/)
 
 ## Why we built this library
 
