@@ -21,6 +21,12 @@
 - NumPy, PyTorch, and TensorFlow support
 - Documentation, examples, and tests
 
+## Documentation
+
+Full documentation is available at:
+
+- **Documentation website:** https://hdmrlib.github.io/HDMRLib/
+
 ## Installation
 
 Install the package from PyPI:
@@ -65,11 +71,6 @@ X_reconstructed = model.reconstruct()
 components = model.components()
 ```
 
-## Documentation
-
-Full documentation is available at:
-
-- **Documentation website:** https://hdmrlib.github.io/HDMRLib/
 
 ## Supported Backends
 
